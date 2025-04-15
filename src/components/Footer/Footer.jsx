@@ -45,8 +45,8 @@ const Footer = () => {
           {/* Company Details */}
           <div>
             <h1 className="sm:text-3xl text-xl font-bold mb-3 flex items-center gap-3">
-              <img src={footerLogo} alt="Glority Logo" className="max-w-[50px]" />
-              Glority
+              <img src={footerLogo} alt="Glowriti Logo" className="max-w-[50px]" />
+              Glowriti
             </h1>
             <p className="text-gray-300 text-sm">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum in

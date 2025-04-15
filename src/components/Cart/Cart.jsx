@@ -1,9 +1,24 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../components/context/CartContext';
 import { FaTrash, FaMinus, FaPlus } from 'react-icons/fa';
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity } = useCart();
+
+  const handleCheckout = () => {
+   
+    try {
+      console.log('Attempting checkout...');
+      // Add state to track where user came from
+      navigate('/login', { state: { returnTo: '/cart' } });
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Optionally add a user-friendly error message
+      alert('Unable to proceed to checkout. Please try again.');
+    }
+  };
 
   const total = cartItems.reduce((sum, item) => {
     const price = parseInt(item.price.replace('Rs.', ''));
@@ -41,7 +56,7 @@ const CartPage = () => {
                         <span className="w-8 text-center">{item.quantity || 1}</span>
                         <button 
                           onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
-                          className="p-1 border rounded-full "
+                          className="p-1 border rounded-full"
                         >
                           <FaPlus size={12} />
                         </button>
@@ -49,7 +64,7 @@ const CartPage = () => {
                       
                       <button 
                         onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 flex items-center gap-1"
+                         className="text-red-500 hover:text-red-700 flex items-center gap-1"
                       >
                         <FaTrash /> Remove
                       </button>
@@ -62,7 +77,7 @@ const CartPage = () => {
           
           <div className="lg:col-span-1">
             <div className="bg-gray-50 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold mb-4 ">Order Summary</h2>
+              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
               <div className="space-y-2 mb-4">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
@@ -79,8 +94,12 @@ const CartPage = () => {
                   <span>Rs.{total}</span>
                 </div>
               </div>
-              <button className="w-full mt-6 bg-primary text-white py-3 rounded-lg hover:bg-primary/90">
-                Proceed to Checkout
+              <button 
+                onClick={handleCheckout}
+                className="w-full mt-6 bg-orange-500 text-white py-3 rounded-lg hover:bg-orange-600 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                type="button"
+              >
+                <span>Proceed to Checkout</span>
               </button>
             </div>
           </div>

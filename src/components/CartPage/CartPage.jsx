@@ -13,8 +13,22 @@ const CartPage = () => {
   }, 0);
 
   const handleCheckout = () => {
-    // Navigate to checkout or handle checkout logic
-    console.log('Proceeding to checkout...');
+    try {
+      console.log('Attempting checkout...');
+      if (cartItems.length === 0) {
+        alert('Your cart is empty');
+        return;
+      }
+      navigate('/login', { 
+        state: { 
+          returnTo: '/cart',
+          cartTotal: total 
+        } 
+      });
+    } catch (error) {
+      console.error('Navigation error:', error);
+      alert('Unable to proceed to checkout. Please try again.');
+    }
   };
   return (
     <div className="container mx-auto px-4 py-8">
@@ -105,7 +119,10 @@ const CartPage = () => {
                   <span>Rs.{total}</span>
                 </div>
               </div>
-              <button className="bg-gradient-to-r from-primary bg-orange-400 to-secondary hover:scale-105 duration-300 text-white py-3 px-8 rounded-lg w-full font-semibold shadow-lg hover:shadow-xl transition-all">
+              <button 
+                onClick={handleCheckout}
+                className="bg-gradient-to-r from-primary bg-orange-400 to-secondary hover:scale-105 duration-300 text-white py-3 px-8 rounded-lg w-full font-semibold shadow-lg hover:shadow-xl transition-all"
+              >
                 PLACE ORDER
               </button>
             </div>

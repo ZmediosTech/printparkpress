@@ -18,6 +18,7 @@ import Login from "./components/Login/Login";
 import Signup from "./components/signup/signup";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Profile from "./components/Profile/Profile";
+import { AuthProvider } from './components/context/AuthContext';
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);
   const [error, setError] = useState(null);
@@ -46,6 +47,7 @@ function App() {
 
   return (
     <Router>
+       <AuthProvider>
       <CartProvider>
         <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
           <Navbar handleOrderPopup={handleOrderPopup} />
@@ -81,7 +83,7 @@ function App() {
           <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
         </div>
       </CartProvider>
-      
+      </AuthProvider>
     </Router>
   );
 }
