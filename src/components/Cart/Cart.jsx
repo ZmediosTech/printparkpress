@@ -6,7 +6,7 @@ import { FaTrash, FaMinus, FaPlus } from 'react-icons/fa';
 const CartPage = () => {
   const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity } = useCart();
-
+console.log(cartItems,"cartItems")
   const handleCheckout = () => {
    
     try {

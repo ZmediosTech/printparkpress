@@ -6,7 +6,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const { cartItems, removeFromCart,updateQuantity } = 
   useCart();
-
+console.log(cartItems,"cartItems")
   const total = cartItems.reduce((sum, item) => {
     const price = parseInt(item.price.replace('Rs.', ''));
     return sum + price * (item.quantity || 1);
@@ -24,7 +24,7 @@ const CartPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
        <div className="flex justify-between items-center mb-8">
-      <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
+      <h1 className="text-2xl font-bold mb-8">aShopping Cart</h1>
 
       <button 
           onClick={() => navigate('/')}

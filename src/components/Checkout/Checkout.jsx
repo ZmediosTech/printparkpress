@@ -7,9 +7,11 @@ const Checkout = () => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
   const { userEmail } = useAuth();
   const { cartItems, removeFromCart } = useCart();
+  console.log(cartItems,"cartItems")
   const navigate = useNavigate();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  console.log(selectedAddress,"selectedAddress")
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [newAddress, setNewAddress] = useState({
@@ -60,7 +62,7 @@ const Checkout = () => {
     const savedAddresses = JSON.parse(localStorage.getItem('addresses')) || [];
     setAddresses(savedAddresses);
     if (savedAddresses.length > 0) {
-      setSelectedAddress(0);
+      setSelectedAddress(savedAddresses);
     }
   }, []);
 
@@ -79,17 +81,18 @@ const Checkout = () => {
             
             {addresses.map((address, index) => (
               <div 
+              
                 key={index}
                 className={`border p-4 rounded-lg mb-4 cursor-pointer ${
                   selectedAddress === index ? 'border-orange-500 bg-orange-50' : ''
                 }`}
-                onClick={() => setSelectedAddress(index)}
+                onClick={() => setSelectedAddress(address)}
               >
                 <div className="flex items-start gap-4">
                   <input 
                     type="radio" 
                     checked={selectedAddress === index}
-                    onChange={() => setSelectedAddress(index)}
+                    onChange={() => setSelectedAddress(address)}
                     className="mt-1"
                   />
                   <div className="flex-1">
@@ -329,23 +332,21 @@ const Checkout = () => {
                 const orderData = {
                   user: {
                     email: "nitika2001n@gmail.com",
-                    fullName: "Nitika Arora",
-                    mobile: "7817957071",
+                    fullName: selectedAddress.fullName,
+                    mobile: selectedAddress.mobile,
                     address: {
-                      street: "rtryhtr",
-                      city: "noida",
-                      pincode: "243601"
+                      street: selectedAddress.locality,
+                      city: selectedAddress.cityDistrict,
+                      pincode: selectedAddress.pincode
                     }
                   },
-                  products: [
-                    {
-                      productId: "123",
-                      name: "Rosemary Hair Oil",
-                      price: 300,
-                      quantity: 3
-                    }
-                  ],
-                  totalAmount: 900,
+                  products: cartItems.map(item => ({
+                    productId: item.id, // Use the dynamic product ID from cartItem
+                    name: item.title, // Use the dynamic title from cartItem
+                    price: parseInt(item.price.replace('Rs.', '')), // Parse price to number (if necessary)
+                    quantity: item.quantity, // Use the dynamic quantity from cartItem
+                  })),
+                  totalAmount: total, 
                   paymentMethod: "Cash on Delivery"
                 };
 
