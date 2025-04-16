@@ -19,6 +19,7 @@ import Signup from "./components/signup/signup";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Profile from "./components/Profile/Profile";
 import { AuthProvider } from './components/context/AuthContext';
+import Checkout from './components/Checkout/Checkout';
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);
   const [error, setError] = useState(null);
@@ -65,18 +66,19 @@ function App() {
                   </>
                 } 
               />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route 
-                path="/product/:id" 
-                element={
-                  <Suspense fallback={<div>Loading product...</div>}>
-                    <ProductDetail />
-                  </Suspense>
-                } 
-              />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+            <Route path="/cart" element={<CartPage />} />
+  <Route path="/checkout" element={<Checkout />} />
+  <Route path="/profile" element={<Profile />} />
+  <Route 
+    path="/product/:id" 
+    element={
+      <Suspense fallback={<div>Loading product...</div>}>
+        <ProductDetail />
+      </Suspense>
+    } 
+  />
+  <Route path="/login" element={<Login />} />
+  <Route path="/signup" element={<Signup />} />
             </Routes>
           </Suspense>
           <Footer />

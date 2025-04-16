@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaTruck, FaBell, FaStar } from 'react-icons/fa';
 import { useAuth } from '../../components/context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 const Login = () => {
   const { userEmail, login } = useAuth();
+   const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const { cartItems } = useCart();
   const [email, setEmail] = useState(userEmail || '');
   const [currentStep, setCurrentStep] = useState(1);
   const [address, setAddress] = useState({
@@ -15,6 +20,57 @@ const Login = () => {
     city: '',
     pincode: ''
   });
+  const handleAddressSubmit = async () => {
+    if (!address.fullName || !address.mobile || !address.street || !address.city || !address.pincode) {
+      alert('Please fill all address fields');
+      return;
+    }
+
+    try {
+      const orderData = {
+        user: {
+          email: email,
+          fullName: address.fullName,
+          mobile: address.mobile,
+          address: {
+            street: address.street,
+            city: address.city,
+            pincode: address.pincode
+          }
+        },
+        products: cartItems.map(item => ({
+          productId: item.id,
+          name: item.title,
+          price: parseInt(item.price.replace('Rs.', '')),
+          quantity: item.quantity || 1
+        })),
+        totalAmount: cartItems.reduce((sum, item) => {
+          const price = parseInt(item.price.replace('Rs.', ''));
+          return sum + price * (item.quantity || 1);
+        }, 0),
+        paymentMethod: "Cash on Delivery"
+      };
+
+      const response = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to place order');
+      }
+
+      const data = await response.json();
+      console.log('Order placed successfully:', data);
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Failed to place order. Please try again.');
+    }
+  };
   useEffect(() => {
     if (userEmail) {
       setCurrentStep(2); // Skip to address if already logged in
@@ -33,13 +89,7 @@ const Login = () => {
     setCurrentStep(2);
   };
 
-  const handleAddressSubmit = () => {
-    if (!address.fullName || !address.mobile || !address.street || !address.city || !address.pincode) {
-      alert('Please fill all address fields');
-      return;
-    }
-    setCurrentStep(3);
-  };
+ 
 
   const handlePaymentSubmit = () => {
     // Here you would typically process the payment
@@ -69,6 +119,71 @@ const Login = () => {
       case 2:
         return (
           <div className="space-y-4">
+             {savedAddresses.length > 0 && !showAddressForm && (
+          <>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold">Saved Addresses</h3>
+              <button
+                onClick={() => setShowAddressForm(true)}
+                className="text-orange-500 font-semibold"
+              >
+                + Add New Address
+              </button>
+            </div>
+            <div className="space-y-4">
+              {savedAddresses.map((addr) => (
+                <div 
+                  key={addr.id}
+                  className={`border p-4 rounded-lg cursor-pointer ${
+                    selectedAddressId === addr.id ? 'border-orange-500' : ''
+                  }`}
+                  onClick={() => setSelectedAddressId(addr.id)}
+                >
+                  <div className="flex justify-between">
+                    <span className="font-semibold">{addr.fullName}</span>
+                    <div className="space-x-4">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setAddress(addr);
+                          setShowAddressForm(true);
+                        }}
+                        className="text-blue-500"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 mt-2">{addr.mobile}</p>
+                  <p className="text-gray-600">
+                    {addr.street}, {addr.city}, {addr.pincode}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {selectedAddressId && (
+              <button
+                onClick={handleAddressSubmit}
+                className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all"
+              >
+                DELIVER HERE
+              </button>
+            )}
+          </>
+        )}
+  {(showAddressForm || savedAddresses.length === 0) && (
+          <>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold">Add New Address</h3>
+              {savedAddresses.length > 0 && (
+                <button
+                  onClick={() => setShowAddressForm(false)}
+                  className="text-orange-500 font-semibold"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
             <input
               type="text"
               placeholder="Full Name"
@@ -107,13 +222,25 @@ const Login = () => {
               />
             </div>
             <button
-              onClick={handleAddressSubmit}
+              onClick={async () => {
+                if (!address.fullName || !address.mobile || !address.street || !address.city || !address.pincode) {
+                  alert('Please fill all address fields');
+                  return;
+                }
+                const newAddress = { ...address, id: Date.now() };
+                setSavedAddresses([...savedAddresses, newAddress]);
+                setSelectedAddressId(newAddress.id);
+                setShowAddressForm(false);
+                await handleAddressSubmit();
+              }}
               className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-all"
             >
-              DELIVER HERE
+              SAVE AND DELIVER HERE
             </button>
-          </div>
-        );
+          </>
+        )}
+      </div>
+    );
       case 3:
         return (
           <div className="space-y-4">

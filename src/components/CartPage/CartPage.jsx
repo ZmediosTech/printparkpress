@@ -13,23 +13,14 @@ const CartPage = () => {
   }, 0);
 
   const handleCheckout = () => {
-    try {
-      console.log('Attempting checkout...');
-      if (cartItems.length === 0) {
-        alert('Your cart is empty');
-        return;
-      }
-      navigate('/login', { 
-        state: { 
-          returnTo: '/cart',
-          cartTotal: total 
-        } 
-      });
-    } catch (error) {
-      console.error('Navigation error:', error);
-      alert('Unable to proceed to checkout. Please try again.');
+    if (cartItems.length === 0) {
+      alert('Your cart is empty');
+      return;
     }
+    navigate('/checkout');
   };
+  
+ 
   return (
     <div className="container mx-auto px-4 py-8">
        <div className="flex justify-between items-center mb-8">
