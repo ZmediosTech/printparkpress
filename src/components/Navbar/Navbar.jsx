@@ -88,29 +88,40 @@ const Navbar = ({ handleOrderPopup }) => {
               <div className="w-[300px] mx-4">
                 <SearchBar products={ProductsData} />
               </div>
-              <div className="relative">
-                <button 
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="p-2 hover:text-orange-500 transition-colors"
-                >
-                  <FaUser className="text-xl text-gray-700 dark:text-white" />
-                </button>
+
+
+
+                         {/*profile*/}
+                         <div className="relative">
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="p-2 hover:text-orange-500 transition-colors flex items-center gap-1"
+                  >
+                    <FaUser className="text-xl text-gray-700 dark:text-white" />
+                    <FaCaretDown className="text-sm text-gray-700 dark:text-white" />
+                  </button>
+                </div>
 
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                    <Link
-                      to="/signup"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      Sign Up
-                    </Link>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100 transform transition-all duration-200">
+                    <div className="px-4 py-3 text-sm border-b border-gray-100">
+                      <span className="text-gray-600">New customer? </span>
+                      <Link
+                        to="/signup"
+                        className="text-blue-600 hover:text-blue-700 font-medium"
+                        onClick={() => setShowProfileMenu(false)}
+                      >
+                        Sign Up
+                      </Link>
+                    </div>
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       onClick={() => setShowProfileMenu(false)}
                     >
-                      Profile
+                      <span className="text-blue-500 mr-3 text-lg">○</span>
+                      <span className="font-medium">My Profile</span>
                     </Link>
                   </div>
                 )}
