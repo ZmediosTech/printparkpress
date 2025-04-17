@@ -5,14 +5,16 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
-  const { cartItems, getCartTotal, clearCart } = useCart();
+  const { cartItems, clearCart } = useCart();
+  console.log(cartItems,"cartItems")
   const { userEmail } = useAuth();
   const navigate = useNavigate();
 
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
   const [addresses, setAddresses] = useState(() => {
-    const savedAddresses = localStorage.getItem('userAddresses');
+    const savedAddresses = localStorage.getItem('addresses');
     return savedAddresses ? JSON.parse(savedAddresses) : [
       {
         name: 'John Doe',
@@ -26,7 +28,12 @@ const Checkout = () => {
 
   const [editedAddress, setEditedAddress] = useState({});
   const [isEditingIndex, setIsEditingIndex] = useState(null);
-
+  const [profileData, setProfileData] = useState({
+    fullName: '',
+    mobile: '',
+    email: '',
+    addresses: JSON.parse(localStorage.getItem('addresses')) || []
+  });
   const handleDeliverHere = (index) => {
     setSelectedAddressIndex(index);
     toast('Address selected for delivery', {
@@ -37,16 +44,36 @@ const Checkout = () => {
       },
     });
   };
-
+  const [email, setEmail] = useState(userEmail || '');
   const handleEditClick = (index) => {
-    setIsEditingIndex(index);
-    setEditedAddress(addresses[index]);
-    setShowEditModal(true);
+    setIsEditingIndex(index); // Track which address is being edited
+    setNewAddress(profileData.addresses[index]); // Fill form with existing address
+    setShowAddressForm(true); // Show modal
   };
 
   const handleAddressChange = (e) => {
-    const { name, value } = e.target;
-    setEditedAddress(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      if (name === 'saturday' || name === 'sunday') {
+        setNewAddress(prev => ({
+          ...prev,
+          weekends: {
+            ...prev.weekends,
+            [name]: checked
+          }
+        }));
+      } else {
+        setNewAddress(prev => ({
+          ...prev,
+          [name]: checked
+        }));
+      }
+    } else {
+      setNewAddress(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
  
@@ -60,43 +87,114 @@ const Checkout = () => {
       zip: ''
     });
     setIsEditingIndex(addresses.length);
-    setShowEditModal(true);
+    setShowAddressForm(true);
   };
-
-  const handlePlaceOrder = () => {
+console.log( profileData.addresses[selectedAddressIndex], "profileData")
+  const handlePlaceOrder = async () => {
     if (selectedAddressIndex === null) {
       toast.error('Please select a delivery address');
       return;
     }
+    try {
+      const orderData = {
+        user: {
+          email: profileData.addresses[selectedAddressIndex].name || 'manish@yopmail.com',
+          fullName: profileData.addresses[selectedAddressIndex].name,
 
-    toast('Order placed successfully!', {
-      style: {
-        background: '#fff',
-        color: '#000',
-        border: '1px solid #ddd',
-      },
-    });
+          mobile: profileData.addresses[selectedAddressIndex].mobile,
+          address: {
+            street: profileData.addresses[selectedAddressIndex].locality,
+            city: profileData.addresses[selectedAddressIndex].cityDistrict,
+            pincode: profileData.addresses[selectedAddressIndex].pincode,
+          }
+        },
+        products: cartItems.map(item => ({
+          productId: item.id,
+          name: item.title,
+          price: parseInt(item.price.replace('Rs.', '')),
+          quantity: item.quantity || 1
+        })),
+        totalAmount: cartItems.reduce((sum, item) => {
+          const price = parseInt(item.price.replace('Rs.', ''));
+          return sum + price * (item.quantity || 1);
+        }, 0),
+        paymentMethod: "Cash on Delivery"
+      };
+
+      const response = await fetch('http://localhost:5000/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      // if (!response.ok) {
+      //   throw new Error('Failed to place order');
+      // }
+
+      const data = await response.json();
+      console.log('Order placed successfully:', data);
+      toast('Order placed successfully!', {
+        style: {
+          background: '#fff',
+          color: '#000',
+          border: '1px solid #ddd',
+        },
+      });
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
+
+ 
     clearCart();
     navigate('/');
   };
    // Add this useEffect to save addresses when they change
-   useEffect(() => {
-    localStorage.setItem('userAddresses', JSON.stringify(addresses));
-  }, [addresses]);
+  useEffect(() => {
+    localStorage.setItem('addresses', JSON.stringify(profileData.addresses));
+  }, [profileData.addresses]);
 
-  const saveEditedAddress = () => {
-    const updatedAddresses = [...addresses];
-    updatedAddresses[isEditingIndex] = editedAddress;
-    setAddresses(updatedAddresses);
-    setShowEditModal(false);
-    setIsEditingIndex(null);
-    localStorage.setItem('userAddresses', JSON.stringify(updatedAddresses));
-    toast('Address updated successfully', {
-      style: {
-        background: '#fff',
-        color: '#000',
-        border: '1px solid #ddd',
+
+ const [newAddress, setNewAddress] = useState({
+    name: '',
+    mobile: '',
+    pincode: '',
+    state: '',
+    address: '',
+    locality: '',
+    cityDistrict: '',
+    addressType: 'Home',
+    weekends: {
+      saturday: false,
+      sunday: false
+    },
+    isDefault: false
+  });
+
+
+  const handleAddressSubmit = (e) => {
+    e.preventDefault();
+    setProfileData(prev => ({
+      ...prev,
+      addresses: [...prev.addresses, newAddress]
+    }));
+    setShowAddressForm(false);
+    setNewAddress({
+      name: '',
+      mobile: '',
+      pincode: '',
+      state: '',
+      address: '',
+      locality: '',
+      cityDistrict: '',
+      addressType: 'Home',
+      weekends: {
+        saturday: false,
+        sunday: false
       },
+      isDefault: false
     });
   };
 
@@ -113,17 +211,17 @@ const Checkout = () => {
             >
               + Add New Address
             </button>
-          {addresses.map((address, index) => (
+          {profileData?.addresses.map((address, index) => (
             <div
               key={index}
-              className={`border rounded-lg p-4 mb-4 ${
+              className={`border rounded-lg p-4 mt-8 mb-4 ${
                 selectedAddressIndex === index ? 'border-orange-500 bg-orange-50' : 'border-gray-300'
               }`}
             >
               <div className="flex justify-between items-start">
                 <div>
                   <p className="font-semibold">{address.name}</p>
-                  <p className="text-gray-600 mt-1">{address.street}</p>
+                  <p className="text-gray-600 mt-1">{address.address}</p>
                   <p className="text-gray-600">
                     {address.city}, {address.state} {address.zip}
                   </p>
@@ -170,7 +268,9 @@ const Checkout = () => {
                 <div className="border-t pt-4 mt-4">
                   <div className="flex justify-between font-semibold">
                     <span>Total Amount</span>
-                    <span>₹{getCartTotal}</span>
+                    <span>₹
+                      {cartItems.reduce((total, item) => total + parseFloat(item.price) * item.quantity, 0)}
+                    </span>
                   </div>
                 </div>
                 <button
@@ -186,73 +286,161 @@ const Checkout = () => {
       </div>
 
       {/* Edit Address Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Edit Address</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                <input
-                  name="name"
-                  value={editedAddress.name}
-                  onChange={handleAddressChange}
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                <input
-                  name="street"
-                  value={editedAddress.street}
-                  onChange={handleAddressChange}
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <input
-                  name="city"
-                  value={editedAddress.city}
-                  onChange={handleAddressChange}
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                <input
-                  name="state"
-                  value={editedAddress.state}
-                  onChange={handleAddressChange}
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                <input
-                  name="zip"
-                  value={editedAddress.zip}
-                  onChange={handleAddressChange}
-                  className="w-full border p-2 rounded"
-                />
-              </div>
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={saveEditedAddress}
-                  className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-                >
-                  Save Address
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {showAddressForm && (
+         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+         <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
+           <h3 className="text-xl font-semibold mb-4">Add New Address</h3>
+           <form onSubmit={handleAddressSubmit} className="space-y-4">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <input
+                 type="text"
+                 name="name"
+                 placeholder="Name *"
+                 value={newAddress.name}
+                 onChange={handleAddressChange}
+                 className="border p-2 rounded-md"
+                 required
+               />
+               <input
+                 type="tel"
+                 name="mobile"
+                 placeholder="Mobile *"
+                 value={newAddress.mobile}
+                 onChange={handleAddressChange}
+                 className="border p-2 rounded-md"
+                 required
+               />
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <input
+                 type="text"
+                 name="pincode"
+                 placeholder="Pincode *"
+                 value={newAddress.pincode}
+                 onChange={handleAddressChange}
+                 className="border p-2 rounded-md"
+                 required
+               />
+               <input
+                 type="text"
+                 name="state"
+                 placeholder="State *"
+                 value={newAddress.state}
+                 onChange={handleAddressChange}
+                 className="border p-2 rounded-md"
+                 required
+               />
+             </div>
+
+             <input
+               type="text"
+               name="address"
+               placeholder="Address (House No, Building, Street, Area) *"
+               value={newAddress.address}
+               onChange={handleAddressChange}
+               className="border p-2 rounded-md w-full"
+               required
+             />
+
+             <input
+               type="text"
+               name="locality"
+               placeholder="Locality/Town *"
+               value={newAddress.locality}
+               onChange={handleAddressChange}
+               className="border p-2 rounded-md w-full"
+               required
+             />
+
+             <input
+               type="text"
+               name="cityDistrict"
+               placeholder="City/District *"
+               value={newAddress.cityDistrict}
+               onChange={handleAddressChange}
+               className="border p-2 rounded-md w-full"
+               required
+             />
+
+             <div className="space-y-3">
+               <p className="font-medium">Type of Address *</p>
+               <div className="flex gap-4">
+                 <label className="flex items-center gap-2">
+                   <input
+                     type="radio"
+                     name="addressType"
+                     value="Home"
+                     checked={newAddress.addressType === 'Home'}
+                     onChange={handleAddressChange}
+                   />
+                   Home
+                 </label>
+                 <label className="flex items-center gap-2">
+                   <input
+                     type="radio"
+                     name="addressType"
+                     value="Office"
+                     checked={newAddress.addressType === 'Office'}
+                     onChange={handleAddressChange}
+                   />
+                   Office
+                 </label>
+               </div>
+             </div>
+
+             <div className="space-y-2">
+               <p>Is your office open on weekends?</p>
+               <div className="space-y-2">
+                 <label className="flex items-center gap-2">
+                   <input
+                     type="checkbox"
+                     name="saturday"
+                     checked={newAddress.weekends.saturday}
+                     onChange={handleAddressChange}
+                   />
+                   Open on Saturday
+                 </label>
+                 <label className="flex items-center gap-2">
+                   <input
+                     type="checkbox"
+                     name="sunday"
+                     checked={newAddress.weekends.sunday}
+                     onChange={handleAddressChange}
+                   />
+                   Open on Sunday
+                 </label>
+               </div>
+             </div>
+
+             <label className="flex items-center gap-2">
+               <input
+                 type="checkbox"
+                 name="isDefault"
+                 checked={newAddress.isDefault}
+                 onChange={handleAddressChange}
+               />
+               Make this as my default address
+             </label>
+
+             <div className="flex justify-end gap-4 mt-6">
+               <button
+                 type="button"
+                 onClick={() => setShowAddressForm(false)}
+                 className="px-4 py-2 border rounded-md hover:bg-gray-100"
+               >
+                 Cancel
+               </button>
+               <button
+                 type="submit"
+                 className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+               >
+                 Save
+               </button>
+             </div>
+           </form>
+         </div>
+       </div>
       )}
     </div>
   );
