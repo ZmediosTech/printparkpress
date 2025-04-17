@@ -2,11 +2,18 @@ import React from 'react';
 import { useCart } from '../context/CartContext';
 import { FaTrash, FaMinus, FaPlus } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+
 const CartPage = () => {
   const navigate = useNavigate();
-  const { cartItems, removeFromCart,updateQuantity } = 
-  useCart();
-console.log(cartItems,"cartItems")
+  const { 
+    cartItems, 
+    removeFromCart, 
+    incrementQuantity, 
+    decrementQuantity,
+    saveForLater,
+    savedItems 
+  } = useCart();
+
   const total = cartItems.reduce((sum, item) => {
     const price = parseInt(item.price.replace('Rs.', ''));
     return sum + price * (item.quantity || 1);
@@ -19,12 +26,11 @@ console.log(cartItems,"cartItems")
     }
     navigate('/checkout');
   };
-  
  
   return (
     <div className="container mx-auto px-4 py-8">
        <div className="flex justify-between items-center mb-8">
-      <h1 className="text-2xl font-bold mb-8">aShopping Cart</h1>
+      <h1 className="text-2xl font-bold mb-8">Shopping Cart</h1>
 
       <button 
           onClick={() => navigate('/')}
@@ -57,32 +63,35 @@ console.log(cartItems,"cartItems")
                   
                   <div className="flex items-center gap-4 mt-4">
                     <div className="flex items-center border rounded">
-                      <button 
-                        onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
-                        className="px-3 py-1 "
-                        disabled={(item.quantity || 1) <= 1}
-                      >
-                        <FaMinus size={12} />
-                      </button>
+                    <button 
+                          onClick={() => decrementQuantity(item)}
+                          className="px-3 py-1 hover:bg-gray-100"
+                          disabled={item.quantity <= 1}
+                        >
+                          <FaMinus size={12} />
+                        </button>
                       <span className="px-3 py-1 border-x">{item.quantity || 1}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
-                        className="px-3 py-1 "
-                      >
-                        <FaPlus size={12} />
-                      </button>
+                          onClick={() => incrementQuantity(item)}
+                          className="px-3 py-1 hover:bg-gray-100"
+                        >
+                          <FaPlus size={12} />
+                        </button>
                     </div>
                     
                     <div className="flex items-center gap-4">
-                      <button className="text-blue-600 hover:text-blue-800">
-                        SAVE FOR LATER
-                      </button>
-                      <button 
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        REMOVE
-                      </button>
+                    <button 
+                          onClick={() => saveForLater(item)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          SAVE FOR LATER
+                        </button>
+                        <button 
+                          onClick={() => removeFromCart(item)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          REMOVE
+                        </button>
                     </div>
                   </div>
                 </div>
@@ -117,6 +126,31 @@ console.log(cartItems,"cartItems")
                 PLACE ORDER
               </button>
             </div>
+          </div>
+        
+        </div>
+      )}
+        {/* Saved Items Section */}
+        {savedItems && savedItems.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-4">Saved For Later</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {savedItems.map((item) => (
+              <div key={item.title} className="border rounded-lg p-4">
+                <img src={item.img} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
+                <p className="font-semibold">{item.title}</p>
+                <p className="text-gray-600 mt-1">{item.price}</p>
+                <button 
+                  onClick={() => {
+                    removeFromCart(item);
+                    addToCart(item);
+                  }}
+                  className="mt-4 w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
+                >
+                  Move to Cart
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}

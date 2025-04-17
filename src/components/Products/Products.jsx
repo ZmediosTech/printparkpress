@@ -79,13 +79,13 @@ const Products = () => {
 
   return (
     <div className="mt-14 mb-12 relative px-4 sm:px-6 lg:px-10 bg-gradient-to-b from-orange-50 to-white">
-      {/* Success Popup */}
-      {showPopup && addedItem && (
+     
+      {showPopup && (
         <div className="fixed top-4 right-4 bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-fade-in-down flex items-center gap-3 transform hover:scale-105 transition-all duration-300">
           <FaCheckCircle className="text-2xl" />
           <span className="font-medium">{addedItem.title} added to cart!</span>
         </div>
-      )}
+      )} 
 
       {/* Product Modal */}
       {showModal && selectedProduct && (
