@@ -11,7 +11,10 @@ const CartPage = () => {
     incrementQuantity, 
     decrementQuantity,
     saveForLater,
-    savedItems 
+    savedItems,
+    moveToCart,
+    removeSavedItem
+
   } = useCart();
 
   const total = cartItems.reduce((sum, item) => {
@@ -130,30 +133,35 @@ const CartPage = () => {
         
         </div>
       )}
-        {/* Saved Items Section */}
-        {savedItems && savedItems.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Saved For Later</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {savedItems.map((item) => (
-              <div key={item.title} className="border rounded-lg p-4">
-                <img src={item.img} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
-                <p className="font-semibold">{item.title}</p>
-                <p className="text-gray-600 mt-1">{item.price}</p>
-                <button 
-                  onClick={() => {
-                    removeFromCart(item);
-                    addToCart(item);
-                  }}
-                  className="mt-4 w-full bg-orange-500 text-white py-2 rounded hover:bg-orange-600"
-                >
-                  Move to Cart
-                </button>
-              </div>
-            ))}
+       {/* Saved Items Section */}
+  {savedItems && savedItems.length > 0 && (
+    <div className="mt-8">
+      <h2 className="text-xl font-semibold mb-4">Saved For Later</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {savedItems.map((item) => (
+          <div key={item.id} className="border rounded-lg p-4 hover:shadow-lg transition-all">
+            <img src={item.img} alt={item.title} className="w-full h-48 object-cover rounded mb-4" />
+            <p className="font-semibold">{item.title}</p>
+            <p className="text-gray-600 mt-1">{item.price}</p>
+            <div className="flex gap-2 mt-4">
+              <button 
+                onClick={() => moveToCart(item)}
+                className="flex-1 bg-orange-500 text-white py-2 rounded hover:bg-orange-600 transition-colors"
+              >
+                Move to Cart
+              </button>
+              <button 
+                onClick={() => removeSavedItem(item)}
+                className="px-3 py-2 text-red-500 hover:text-red-700 border border-red-500 rounded hover:bg-red-50 transition-colors"
+              >
+                <FaTrash size={16} />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
+    </div>
+  )}
     </div>
   );
 };

@@ -8,9 +8,18 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  const [savedItems, setSavedItems] = useState(() => {
+    const savedForLater = localStorage.getItem('savedItems');
+    return savedForLater ? JSON.parse(savedForLater) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem('savedItems', JSON.stringify(savedItems));
+  }, [savedItems]);
   
   const removeFromCart = (product) => {
     setCartItems(cartItems.filter(item => item.title !== product.title));
@@ -70,6 +79,23 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  const saveForLater = (product) => {
+    removeFromCart(product);
+    const existingProduct = savedItems.find(item => item.title === product.title);
+    if (!existingProduct) {
+      setSavedItems([...savedItems, product]);
+    }
+  };
+
+  const moveToCart = (product) => {
+    setSavedItems(savedItems.filter(item => item.title !== product.title));
+    addToCart(product);
+  };
+
+  const removeSavedItem = (product) => {
+    setSavedItems(savedItems.filter(item => item.title !== product.title));
+  };
+
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem('cartItems');
@@ -77,13 +103,17 @@ export const CartProvider = ({ children }) => {
 
   return (
     <CartContext.Provider value={{ 
-      cartItems, 
+      cartItems,
+      savedItems, 
       addToCart, 
       updateQuantity,
       incrementQuantity,
       decrementQuantity,
       removeFromCart,
-      clearCart
+      clearCart,
+      saveForLater,
+      moveToCart,
+      removeSavedItem
     }}>
       {children}
     </CartContext.Provider>

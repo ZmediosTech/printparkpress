@@ -12,7 +12,7 @@ export const ProductsData = [
     id: 1,
     img: Img1,
     title: "Bhringraj Hair Oil",
-    price: "900",
+    price: "Rs.900",
     rating: 4,
     aosDelay: "0",
     description:
@@ -22,7 +22,7 @@ export const ProductsData = [
     id: 2,
     img: Img2,
     title: "Rosemary Hair Oil",
-    price: "800",
+    price: "Rs.800",
     aosDelay: "200",
     description:
       "Rosemary oil stimulates circulation and promotes hair growth. Its antioxidant and antimicrobial properties reduce dandruff and strengthen hair strands for long-lasting shine.",
@@ -31,7 +31,7 @@ export const ProductsData = [
     id: 3,
     img: Img3,
     title: "Tea Tree Shampoo",
-    price: "700",
+    price: "Rs.700",
     aosDelay: "400",
     description:
       "Tea tree shampoo helps control dandruff, soothes the scalp, and removes buildup. Its antifungal properties balance scalp health and refresh oily hair.",
@@ -40,7 +40,7 @@ export const ProductsData = [
     id: 4,
     img: Img4,
     title: "Rosemary Water",
-    price: "600",
+    price: "Rs.600",
     aosDelay: "600",
     description:
       "Rosemary water supports hair growth, reduces dandruff, and strengthens hair roots. It improves scalp circulation and restores smoothness and shine.",
@@ -79,13 +79,13 @@ const Products = () => {
 
   return (
     <div className="mt-14 mb-12 relative px-4 sm:px-6 lg:px-10 bg-gradient-to-b from-orange-50 to-white">
-     
-      {showPopup && (
+      {/* Success Popup */}
+      {showPopup && addedItem && (
         <div className="fixed top-4 right-4 bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-fade-in-down flex items-center gap-3 transform hover:scale-105 transition-all duration-300">
           <FaCheckCircle className="text-2xl" />
           <span className="font-medium">{addedItem.title} added to cart!</span>
         </div>
-      )} 
+      )}
 
       {/* Product Modal */}
       {showModal && selectedProduct && (
@@ -145,7 +145,7 @@ const Products = () => {
               </div>
               
               <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-4 text-center">
-                Rs.{data.price}
+                {data.price}
               </p>
               
               <div className="text-center">
