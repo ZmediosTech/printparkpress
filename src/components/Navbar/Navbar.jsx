@@ -12,6 +12,8 @@ import { ProductsData } from '../Products/Products';
 import SearchBar from "../SearchBar/SearchBar.jsx";
 import { FaUser } from "react-icons/fa";
 import { Link } from 'react-router-dom';
+import SignupModal from '../Auth/SignupModal';
+import LoginModal from '../Auth/LoginModal';
 const Menu = [
   {
     id: 1,
@@ -46,7 +48,8 @@ const Navbar = ({ handleOrderPopup }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const navigate = useNavigate();
   const { cartItems } = useCart();
-
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -62,6 +65,7 @@ const Navbar = ({ handleOrderPopup }) => {
   };
 
   return (
+    <>
     <nav className="shadow-sm w-full">
       <div className="shadow-md bg-orange-300 dark:bg-gray-900 dark:text-white duration-200  relative z-40">
         <CartSidebar 
@@ -103,18 +107,18 @@ const Navbar = ({ handleOrderPopup }) => {
                   </button>
                 </div>
 
-                {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100 transform transition-all duration-200">
-                    <div className="px-4 py-3 text-sm border-b border-gray-100">
-                      <span className="text-gray-600">New customer? </span>
-                      <Link
-                        to="/signup"
-                        className="text-blue-600 hover:text-blue-700 font-medium"
-                        onClick={() => setShowProfileMenu(false)}
-                      >
-                        Sign Up
-                      </Link>
-                    </div>
+        {/* Dropdown content */}
+        {showProfileMenu && (
+  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+      <div className="px-4 py-3 text-sm border-b border-gray-100">
+      <span className="text-gray-600">New customer? </span>
+      <button 
+        onClick={() => setIsSignupOpen(true)}
+        className="text-blue-500 hover:text-blue-700 font-medium"
+      >
+        Sign Up
+      </button>
+    </div>
                     <Link
                       to="/profile"
                       className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -169,6 +173,23 @@ const Navbar = ({ handleOrderPopup }) => {
         
       </div>
     </nav>
+    <SignupModal 
+      isOpen={isSignupOpen} 
+      onClose={() => setIsSignupOpen(false)}
+      onSwitchToLogin={() => {
+        setIsSignupOpen(false);
+        setIsLoginOpen(true);
+      }}
+    />
+    <LoginModal 
+      isOpen={isLoginOpen}
+      onClose={() => setIsLoginOpen(false)}
+      onSwitchToSignup={() => {
+        setIsLoginOpen(false);
+        setIsSignupOpen(true);
+      }}
+    />
+</>
   );
 };
 
