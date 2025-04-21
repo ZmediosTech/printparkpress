@@ -4,13 +4,15 @@ import Image2 from "../../assets/hero/Rosemary.png";
 import Image3 from "../../assets/hero/TeaTree.png";
 import Image4 from "../../assets/hero/RosemaryWater.png";
 import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 const ImageList = [
   {
     id: 1,
     img: Image1,
     title: "Bhringraj Hair Oil ",
-    price: '200',
+    price: "200",
     description:
       "Bhringraj oil promotes hair growth, prevents dandruff, and strengthens the roots. Regular use improves scalp health and reduces hair loss naturally. This Ayurvedic agent nourishes deeply, reinforcing shine and volume.",
   },
@@ -18,7 +20,7 @@ const ImageList = [
     id: 2,
     img: Image2,
     title: "Rosemary Hair Oil ",
-    price: '1200',
+    price: "1200",
     description:
       "Rosemary oil improves circulation and stimulates hair growth. Its antioxidant and antimicrobial properties fight dandruff and strengthen hair, ensuring long-lasting strength and shine.",
   },
@@ -26,7 +28,7 @@ const ImageList = [
     id: 3,
     img: Image3,
     title: "Tea Tree Shampoo",
-    price: '900',
+    price: "900",
     description:
       "Tea tree shampoo soothes dandruff and itchy scalp while removing buildup. With antifungal properties, it promotes freshness and balances scalp health for clean, strong hair.",
   },
@@ -34,7 +36,7 @@ const ImageList = [
     id: 4,
     img: Image4,
     title: "Rosemary Water",
-    price: '800',
+    price: "800",
     description:
       "Rosemary water boosts hair growth and reduces dandruff. It strengthens roots, restores shine, and keeps hair smooth and healthy with regular use.",
   },
@@ -42,17 +44,27 @@ const ImageList = [
 
 const Hero = ({ handleOrderPopup }) => {
   const settings = {
-    dots: false,
+    dots: true,
     arrows: false,
     infinite: true,
     speed: 800,
     slidesToScroll: 1,
+    slidesToShow: 1,
     autoplay: true,
     autoplaySpeed: 4000,
     cssEase: "ease-in-out",
     pauseOnHover: false,
     pauseOnFocus: true,
+    appendDots: dots => (
+      <div className="w-full flex justify-center mt-8">
+        <ul className="flex space-x-3">{dots}</ul>
+      </div>
+    ),
+    customPaging: i => (
+      <div className="w-4 h-4  rounded-full bg-gray-400 hover:bg-orange-500 transition-all duration-300 hover:scale-125"></div>
+    )
   };
+
   return (
     <div className="relative overflow-hidden min-h-[550px] sm:min-h-[650px] bg-gradient-to-br from-orange-50 to-orange-100 flex items-center dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 dark:text-white duration-200">
       {/* Decorative background elements */}
@@ -63,37 +75,24 @@ const Hero = ({ handleOrderPopup }) => {
       </div>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-4 sm:px-8 relative z-10 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-8 relative z-10 max-w-7xl w-full">
         <Slider {...settings}>
           {ImageList.map((data) => (
             <div key={data.id}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 lg:gap-16 items-center">
                 {/* Text Section */}
                 <div className="flex flex-col justify-center gap-6 text-center sm:text-left order-2 sm:order-1 max-w-xl mx-auto sm:mx-0">
-                  <h1
-                    data-aos="zoom-out"
-                    data-aos-duration="500"
-                    className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-900 dark:from-orange-400 dark:to-orange-600 leading-tight"
-                  >
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-orange-900 dark:from-orange-400 dark:to-orange-600 leading-tight">
                     {data.title}
                   </h1>
-                  <p
-                    data-aos="fade-up"
-                    data-aos-duration="500"
-                    data-aos-delay="100"
-                    className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 backdrop-blur-sm"
-                  >
+                  <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 backdrop-blur-sm">
                     {data.description}
                   </p>
-                 
                 </div>
 
                 {/* Image Section */}
                 <div className="order-1 sm:order-2">
-                  <div
-                    data-aos="zoom-in"
-                    className="flex justify-center sm:justify-end relative p-4"
-                  >
+                  <div className="flex justify-center sm:justify-end relative p-4">
                     <div className="absolute inset-0 bg-gradient-to-r from-orange-200/30 to-orange-100/30 dark:from-orange-900/20 dark:to-orange-800/20 rounded-3xl blur-2xl transform scale-95 -z-10"></div>
                     <img
                       src={data.img}
@@ -107,6 +106,14 @@ const Hero = ({ handleOrderPopup }) => {
           ))}
         </Slider>
       </div>
+
+      {/* Dot styling */}
+      <style>{`
+        .slick-dots li.slick-active div {
+          background-color: #ea580c;
+          transform: scale(1.3);
+        }
+      `}</style>
     </div>
   );
 };

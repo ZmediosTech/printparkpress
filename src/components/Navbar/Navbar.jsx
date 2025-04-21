@@ -78,12 +78,12 @@ const Navbar = ({ handleOrderPopup }) => {
         <div className="bg-primary/40 py-4">
         <div className="max-w-screen-xl mx-auto px-4 w-full flex justify-between items-center">
 
-            {/* Logo */}
-            <div className="flex items-center">
-              <a href="#" className="font-bold flex items-center text-2xl sm:text-3xl flex  items-center gap-3">
+                      {/* Logo */}
+                      <div className="flex items-center">
+              <Link to="/" className="font-bold flex items-center text-2xl sm:text-3xl flex items-center gap-3">
                 <img src={Logo} alt="Logo" className="w-14 h-14 object-contain" />
                 <span className="text-gray-800 dark:text-white">Glowriti</span>
-              </a>
+              </Link>
             </div>
 
             {/* Right Side Items */}

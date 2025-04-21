@@ -1,9 +1,10 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import MyOrders from "./components/MyOrders/MyOrders";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Products from "./components/Products/Products";
+import About from "./components/About/About";  // Ensure this import path is correct
 import TopProducts from "./components/TopProducts/TopProducts";
 import Banner from "./components/Banner/Banner";
 import Subscribe from "./components/Subscribe/Subscribe";
@@ -60,31 +61,30 @@ function App() {
             {/* ✅ Toast Container */}
             <Toaster position="top-right" reverseOrder={false} />
 
-            <Suspense fallback={<div className="text-center py-8">Loading...</div>}>
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <>
-                      <Hero handleOrderPopup={handleOrderPopup} />
-                      <Products handleOrderPopup={handleOrderPopup} />
-                      <Banner />
-                      <Subscribe />
-                      <Testimonials />
-                    </>
-                  }
-                />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/myOrders" element={<MyOrders />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="*" element={<div className="text-center py-20 text-xl">404 - Page Not Found</div>} />
-              </Routes>
-            </Suspense>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Hero handleOrderPopup={handleOrderPopup} />
+                    <Products handleOrderPopup={handleOrderPopup} />
+                    <Banner />
+                    <Subscribe />
+                    <Testimonials />
+                  </>
+                }
+              />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/about" element={<About />} /> 
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/myOrders" element={<MyOrders />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="*" element={<div className="text-center py-20 text-xl">404 - Page Not Found</div>} />
+            </Routes>
 
             <Footer />
             <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />

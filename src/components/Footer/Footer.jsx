@@ -70,8 +70,8 @@ const Footer = () => {
                 ))}
               </ul>
             </div>
-
-            {/* Column 2 */}
+{/* 
+            Column 2
             <div>
               <h1 className="text-xl font-bold mb-3">Links</h1>
               <ul className="flex flex-col gap-3">
@@ -84,7 +84,7 @@ const Footer = () => {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
 
             {/* Social & Contact */}
             <div>
