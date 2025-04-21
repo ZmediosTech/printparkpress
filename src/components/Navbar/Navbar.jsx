@@ -93,8 +93,6 @@ const Navbar = ({ handleOrderPopup }) => {
                 <SearchBar products={ProductsData} />
               </div>
 
-
-
                          {/*profile*/}
                          <div className="relative">
                 <div className="flex items-center gap-2">
@@ -127,6 +125,22 @@ const Navbar = ({ handleOrderPopup }) => {
                       <span className="text-blue-500 mr-3 text-lg">○</span>
                       <span className="font-medium">My Profile</span>
                     </Link>
+                    <Link
+                      to="/myOrders"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowProfileMenu(false)}
+                    >
+                      <span className="text-blue-500 mr-3 text-lg">○</span>
+                      <span className="font-medium">My Orders</span>
+                    </Link>
+                    <Link
+                      to="/wishlist"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setShowProfileMenu(false)}
+                    >
+                      <span className="text-blue-500 mr-3 text-lg">○</span>
+                      <span className="font-medium">My Wishlist</span>
+                    </Link>
                   </div>
                 )}
               </div>
@@ -146,9 +160,6 @@ const Navbar = ({ handleOrderPopup }) => {
     )}
   </button>
 </div>
-
-
-
             </div>
           </div>
         </div>

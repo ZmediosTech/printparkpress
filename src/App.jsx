@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import MyOrders from "./components/MyOrders/MyOrders";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Products from "./components/Products/Products";
@@ -16,7 +16,7 @@ import Login from "./components/Login/Login";
 import Signup from "./components/Signup/Signup";
 import Profile from "./components/Profile/Profile";
 import Checkout from "./components/Checkout/Checkout";
-
+import Wishlist from "./components/Wishlist/Wishlist";
 import { CartProvider } from "./components/context/CartContext";
 import { AuthProvider } from "./components/context/AuthContext";
 
@@ -80,6 +80,8 @@ function App() {
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/myOrders" element={<MyOrders />} />
+                <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="*" element={<div className="text-center py-20 text-xl">404 - Page Not Found</div>} />
               </Routes>
             </Suspense>
