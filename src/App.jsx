@@ -67,6 +67,7 @@ function App() {
                 element={
                   <>
                     <Hero handleOrderPopup={handleOrderPopup} />
+                    <About />
                     <Products handleOrderPopup={handleOrderPopup} />
                     <Banner />
                     <Subscribe />
