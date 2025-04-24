@@ -89,7 +89,7 @@ router.post('/forgot-password', async (req, res) => {
         <p>You requested a password reset. Click the link below to reset your password:</p>
         <a href="${resetLink}" target="_blank">${resetLink}</a>
         <p>If you didn't request this, you can ignore this email.</p>
-        <p>Thanks,<br/>Your App Team</p>
+        <p>Thanks,<br/></p>
       `
     };
 

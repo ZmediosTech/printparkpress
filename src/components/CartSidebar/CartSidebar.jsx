@@ -27,7 +27,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <div key={item.id} className="flex items-center gap-2">
                   <img src={item.img} alt={item.title} className="w-12 h-12 object-cover rounded" />
                   <div className="flex-1">
-                    <p className="font-semibold text-sm">{item.title}</p>
+                    <p className="font-semibold text-sm">{item.title || item.name}</p>
                     <p className="text-sm text-gray-600">
                       {item.price} x {item.quantity || 1}
                     </p>

@@ -65,6 +65,16 @@ const MyOrders = () => {
               <div className="border-b p-4 bg-gray-50">
                 <div className="flex justify-between items-center">
                   <p className="text-gray-600">Order ID: {order._id}</p>
+
+                  <p>
+                    <span className='font-semibold'>Order Date : </span>
+                    {order.orderDate && new Date(order.orderDate).toLocaleDateString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                    
+                  </p>
                   {/* <p className="text-green-600 font-medium">
                     {order.status === 'delivered' ? (
                       `Delivered on ${new Date(order.createdAt).toLocaleDateString('en-IN', {

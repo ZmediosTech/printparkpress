@@ -53,17 +53,17 @@ const About = () => {
         </div>
 
         {/* All Cards in a Single Row */}
-        <div className="flex justify-between items-stretch flex-wrap md:flex-nowrap gap-4 md:gap-6">
+        <div className="flex justify-between items-stretch flex-wrap md:flex-nowrap gap-6 md:gap-6">
           {aboutCards.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-3xl p-5 w-64 shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl border border-orange-100 hover:border-orange-400 hover:ring-2 hover:ring-orange-300 flex flex-col"
+              className="bg-white rounded-3xl p-5  shadow-lg transition-transform duration-500 hover:scale-105 hover:shadow-2xl border border-orange-100  flex flex-col"
             >
               <div className="relative overflow-hidden rounded-2xl mb-4 group">
                 <img
                   src={item.img}
                   alt={item.title}
-                  className="w-full h-52 object-cover rounded-xl transition-transform duration-700 ease-in-out group-hover:scale-110"
+                  className="w-full  object-cover rounded-xl transition-transform duration-700 ease-in-out group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>

@@ -24,7 +24,6 @@ const CartPage = () => {
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      alert("Your cart is empty");
       return;
     }
     navigate("/checkout");
@@ -33,7 +32,7 @@ const CartPage = () => {
   return (
     <div className="container  px-32 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">aShopping Cart</h1>
+        <h1 className="text-2xl font-bold">Shopping Cart</h1>
         <button
           onClick={() => navigate("/")}
           className="bg-gradient-to-r from-primary to-secondary hover:scale-105 duration-300 text-white py-3 px-8 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
@@ -45,12 +44,12 @@ const CartPage = () => {
       {cartItems.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500 text-xl">Your cart is empty</p>
-          <button
+          {/* <button
             onClick={() => navigate("/")}
             className="mt-4 bg-primary text-white py-2 px-6 rounded-lg hover:bg-primary/90 transition"
           >
             Start Shopping
-          </button>
+          </button> */}
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -66,7 +65,7 @@ const CartPage = () => {
                   className="w-24 h-24 object-cover rounded"
                 />
                 <div className="flex-1">
-                  <p className="font-semibold">{item.title}</p>
+                  <p className="font-semibold">{item.title || item.name}</p>
                   <p className="text-gray-600 mt-1">Rs. {item.price}</p>
                   <div className="flex items-center gap-4 mt-4">
                     <div className="flex items-center border rounded">
@@ -145,7 +144,7 @@ const CartPage = () => {
                   alt={item.title}
                   className="w-full h-48 object-cover rounded mb-4"
                 />
-                <p className="font-semibold">{item.title}</p>
+                <p className="font-semibold">{item.title || item.name}</p>
                 <p className="text-gray-600 mt-1">Rs. {item.price}</p>
                 <div className="flex gap-2 mt-4">
                   <button

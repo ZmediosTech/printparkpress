@@ -218,7 +218,7 @@ const Profile = () => {
                     required
                   />
 
-                  <div className="space-y-3">
+                  {/* <div className="space-y-3">
                     <p className="font-medium">Type of Address *</p>
                     <div className="flex gap-4">
                       <label className="flex items-center gap-2">
@@ -242,9 +242,9 @@ const Profile = () => {
                         Office
                       </label>
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <p>Is your office open on weekends?</p>
                     <div className="space-y-2">
                       <label className="flex items-center gap-2">
@@ -266,9 +266,9 @@ const Profile = () => {
                         Open on Sunday
                       </label>
                     </div>
-                  </div>
+                  </div> */}
 
-                  <label className="flex items-center gap-2">
+                  {/* <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
                       name="isDefault"
@@ -276,7 +276,7 @@ const Profile = () => {
                       onChange={handleAddressChange}
                     />
                     Make this as my default address
-                  </label>
+                  </label> */}
 
                   <div className="flex justify-end gap-4 mt-6">
                     <button

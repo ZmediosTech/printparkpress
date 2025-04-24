@@ -231,7 +231,7 @@ const Checkout = () => {
       const data = await response.json();
       if(data.success == true){
         console.log("Order placed successfully:", data);
-        toast("Order placed successfully!", {
+        toast.success("Order placed successfully!", {
           style: {
             background: "#fff",
             color: "#000",

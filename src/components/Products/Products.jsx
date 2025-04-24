@@ -6,7 +6,9 @@ import Img1 from "../../assets/women/BhringrajP.jpg";
 import Img2 from "../../assets/women/RosemaryP.jpg";
 import Img3 from "../../assets/women/TeaTreeP.jpg";
 import Img4 from "../../assets/women/RosemaryWaterP.jpg";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+
 export const ProductsData = [
   {
     id: 1,
@@ -55,14 +57,14 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
-  let email = localStorage.getItem("email")
+  let email = localStorage.getItem("email");
   const { addToCart, cartItems } = useCart();
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
     const productToAdd = {
       ...product,
       id: product._id || product.id, // Handle both API and local products
-      quantity: 1 
+      quantity: 1,
     };
     addToCart(productToAdd);
     setAddedItem(productToAdd);
@@ -73,64 +75,66 @@ const Products = () => {
   const handleWishlist = async (e, product) => {
     e.stopPropagation();
     if (!email) {
-      toast.error('Please login to add items to wishlist', {
+      toast.error("Please login to add items to wishlist", {
         style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
         },
-         position: 'top-right'
+        position: "top-right",
       });
       return;
     }
-  
+
     try {
       const productId = product._id || product.id;
-      const data = await fetch(`http://localhost:5000/api/wishlist/user/${email}/items`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      });
-      
+      const data = await fetch(
+        `http://localhost:5000/api/wishlist/user/${email}/items`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(product),
+        }
+      );
+
       if (data.ok) {
-        setWishlistItems(prev => {
+        setWishlistItems((prev) => {
           const newSet = new Set(prev);
           newSet.add(productId);
           return newSet;
         });
-        toast.success('Item added to wishlist!', {
-          icon: '❤️',
+        toast.success("Item added to wishlist!", {
+          icon: "❤️",
           style: {
-            borderRadius: '10px',
-            background: '#FF6B6B',
-            color: '#fff',
-            padding: '16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+            borderRadius: "10px",
+            background: "#FF6B6B",
+            color: "#fff",
+            padding: "16px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
           },
           duration: 2000,
-          position: 'top-right',
+          position: "top-right",
         });
-       
       } else {
-        toast.error('Item is already in wishlist', {
+        toast.error("Item is already in wishlist", {
           style: {
-            borderRadius: '10px',
-            background: '#333',
-            color: '#fff',
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
           },
-          position: 'top-right' 
+          position: "top-right",
         });
       }
     } catch (error) {
-      toast.error('Error adding to wishlist', {
+      toast.error("Error adding to wishlist", {
         style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
+          borderRadius: "10px",
+          background: "#333",
+          color: "#fff",
         },
-         position: 'top-right'
+        position: "top-right",
       });
     }
   };
@@ -141,7 +145,7 @@ const Products = () => {
     setShowModal(true);
     navigate(`/product/${data._id}`);
   };
-  const fetchProducts = async ()=>{
+  const fetchProducts = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/products");
       const data = await response.json();
@@ -153,11 +157,24 @@ const Products = () => {
     } catch (error) {
       console.error("Error fetching products:", error);
     }
-  }
+  };
 
-  useEffect(()=>{
-   fetchProducts()
-  },[])
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      if (rating >= i) {
+        stars.push(<FaStar key={i} className="text-yellow-400" />);
+      } else if (rating >= i - 0.5) {
+        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
+      } else {
+        stars.push(<FaRegStar key={i} className="text-yellow-400" />);
+      }
+    }
+    return stars;
+  };
 
   return (
     <div className="mt-14 mb-12 relative px-4 sm:px-6 lg:px-10 bg-gradient-to-b from-orange-50 to-white">
@@ -186,9 +203,15 @@ const Products = () => {
                 className="w-full md:w-1/2 h-[400px] object-cover rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300"
               />
               <div className="flex flex-col justify-center">
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">{selectedProduct.title}</h3>
-                <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-6">{selectedProduct.price}</p>
-                <p className="text-gray-600 leading-relaxed text-lg">{selectedProduct.description}</p>
+                <h3 className="text-3xl font-bold text-gray-800 mb-4">
+                  {selectedProduct.title}
+                </h3>
+                <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-6">
+                  {selectedProduct.price}
+                </p>
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  {selectedProduct.description}
+                </p>
               </div>
             </div>
           </div>
@@ -198,14 +221,21 @@ const Products = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16 max-w-2xl mx-auto">
-          <p data-aos="fade-up" className="text-lg font-medium text-orange-500 mb-4">
+          <p
+            data-aos="fade-up"
+            className="text-lg font-medium text-orange-500 mb-4"
+          >
             Top Selling Products for you
           </p>
-          <h1 data-aos="fade-up" className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-900 bg-clip-text text-transparent mb-6">
+          <h1
+            data-aos="fade-up"
+            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-900 bg-clip-text text-transparent mb-6"
+          >
             Products
           </h1>
           <p data-aos="fade-up" className="text-gray-600 text-lg">
-            Choose from our bestsellers loved by customers and powered by nature.
+            Choose from our bestsellers loved by customers and powered by
+            nature.
           </p>
         </div>
 
@@ -215,56 +245,64 @@ const Products = () => {
             <div
               key={data.id}
               className="bg-white cursor-pointer rounded-3xl p-6 w-full max-w-xs shadow-xl transition-all duration-500 hover:scale-105 hover:shadow-2xl relative group backdrop-blur-sm border border-orange-100"
-             
             >
-              <div onClick={(e) => handleProductClick(e, data)} className="group relative overflow-hidden rounded-2xl mb-6">
-              <div className="relative overflow-hidden rounded-2xl mb-6">
-                <img 
-                  src={
-                    `http://localhost:5000${data.imageUrl}`
-                  } 
-                  alt={data.title} 
-                  className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              
-              <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-4 text-center">
-                Rs {data.price}
-              </p>
-              
-              <div className="text-center">
-                <h3 className="font-bold text-gray-800 text-xl mb-3">{data.title}</h3>
-                <p className="text-gray-600 text-sm mb-6 line-clamp-2">
-                  {data.description}
-                </p>
-              </div> 
-              </div> 
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={(e) => handleAddToCart(e, data)}
-                    className="bg-gradient-to-r from-orange-400 to-orange-600 text-white py-2.5 px-6 rounded-full hover:from-orange-500 hover:to-orange-700 flex items-center gap-2 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-orange-300/50"
-                  >
-                    <FaShoppingCart className="text-lg" />
-                    <span>Add to Cart</span>
-                  </button>
-                  <button
-  onClick={(e) => handleWishlist(e, data)}
-  className={`p-3 rounded-full transition-all duration-300 shadow-lg ${
-    wishlistItems.has(data._id || data.id)
-      ? "bg-red-500 text-white shadow-red-300/50"
-      : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-red-300/50"
-  }`}
->
-  <FaHeart className="text-lg" />
-</button>
+              <div
+                onClick={(e) => handleProductClick(e, data)}
+                className="group relative overflow-hidden rounded-2xl mb-6"
+              >
+                <div className="relative overflow-hidden rounded-2xl mb-6">
+                  <img
+                    src={`http://localhost:5000${data.imageUrl}`}
+                    alt={data.title}
+                    className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
+
+                <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-4 text-center">
+                  Rs {data.price}
+                </p>
+
+                <div className="text-center">
+                  <h3 className="font-bold text-gray-800 text-xl mb-3">
+                    {data.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
+                    {data.description}
+                  </p>
+                  <div className="flex items-center justify-center mb-2 gap-1">
+                    {renderStars(data.rating)}
+                    {/* <span className="text-gray-500 text-sm">
+                      ({data.rating})
+                    </span> */}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={(e) => handleAddToCart(e, data)}
+                  className="bg-gradient-to-r from-orange-400 to-orange-600 text-white py-2.5 px-6 rounded-full hover:from-orange-500 hover:to-orange-700 flex items-center gap-2 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-orange-300/50"
+                >
+                  <FaShoppingCart className="text-lg" />
+                  <span>Add to Cart</span>
+                </button>
+                <button
+                  onClick={(e) => handleWishlist(e, data)}
+                  className={`p-3 rounded-full transition-all duration-300 shadow-lg ${
+                    wishlistItems.has(data._id || data.id)
+                      ? "bg-red-500 text-white shadow-red-300/50"
+                      : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-red-300/50"
+                  }`}
+                >
+                  <FaHeart className="text-lg" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </div>
     </div>
-);
+  );
 };
 
 export default Products;
