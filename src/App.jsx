@@ -26,6 +26,7 @@ import "aos/dist/aos.css";
 
 // ✅ Toastify
 import { Toaster } from "react-hot-toast";
+import ResetPassword from "./components/ResetPassword/ResetPassword";
 
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);
@@ -84,6 +85,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/myOrders" element={<MyOrders />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<div className="text-center py-20 text-xl">404 - Page Not Found</div>} />
             </Routes>
 

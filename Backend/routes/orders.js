@@ -1,5 +1,6 @@
 import express from 'express';
 import Order from '../models/Order.js';
+import Wishlist from '../models/Wishlist.js';
 
 const router = express.Router();
 
@@ -30,6 +31,30 @@ router.post('/', async (req, res) => {
     });
   } catch (error) {
     res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+router.get('/user/:email', async (req, res) => {
+  try {
+    const orders = await Order.find({ 'user.email': req.params.email });
+
+    if (orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'No orders found for this user'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
       error: error.message
     });
@@ -74,5 +99,31 @@ router.get('/:id', async (req, res) => {
     });
   }
 });
+
+router.get('/user/:email', async (req, res) => {
+  try {
+    const wishlist = await Wishlist.findOne({ userEmail: req.params.email }).populate('items.productId');
+
+    if (!wishlist) {
+      return res.status(404).json({
+        success: false,
+        error: 'No wishlist found for this user'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: wishlist.items
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+
+
 
 export default router;

@@ -6,9 +6,11 @@ import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
+  console.log(cartItems,"cart")
   const { userEmail } = useAuth();
+  console.log(userEmail,"userEmail")
   const navigate = useNavigate();
-
+  const email = localStorage.getItem("email")
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [isEditingIndex, setIsEditingIndex] = useState(null);
@@ -17,10 +19,10 @@ const Checkout = () => {
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   // Replace handlePlaceOrder with these two functions
   const handleContinueToPayment = () => {
-    if (!userEmail) {
-      toast.error("Please enter your email");
-      return;
-    }
+    // if (!userEmail) {
+    //   toast.error("Please enter your email");
+    //   return;
+    // }
     setShowPaymentOptions(true);
   };
   const handleConfirmOrder = async () => {
@@ -46,15 +48,7 @@ const Checkout = () => {
     fullName: "",
     mobile: "",
     email: "",
-    addresses: JSON.parse(localStorage.getItem("addresses")) || [
-      {
-        name: "John Doe",
-        street: "123 Main St",
-        city: "New York",
-        state: "NY",
-        zip: "10001",
-      },
-    ],
+    addresses: JSON.parse(localStorage.getItem("addresses")),
   });
 
   const [newAddress, setNewAddress] = useState({
@@ -156,7 +150,8 @@ const Checkout = () => {
 
   const handleAddressSubmit = (e) => {
     e.preventDefault();
-    const updatedAddresses = [...profileData.addresses];
+    const updatedAddresses = [...(profileData?.addresses || [])];
+
 
     if (isEditingIndex !== null) {
       updatedAddresses[isEditingIndex] = newAddress;
@@ -195,9 +190,10 @@ const Checkout = () => {
 
     try {
       const selected = profileData.addresses[selectedAddressIndex];
+      console.log(selected,"selected")
       const orderData = {
         user: {
-          email: selected.name || "manish@yopmail.com",
+          email: email ,
           fullName: selected.name,
           mobile: selected.mobile,
           address: {
@@ -207,13 +203,14 @@ const Checkout = () => {
           },
         },
         products: cartItems.map((item) => ({
-          productId: item.id,
-          name: item.title,
-          price: parseInt(item.price.replace("Rs.", "")),
+          productId: item._id,
+          name: item.name,
+          price: parseInt(item.price),
+          image: item.imageUrl,
           quantity: item.quantity || 1,
         })),
         totalAmount: cartItems.reduce((sum, item) => {
-          const price = parseInt(item.price.replace("Rs.", ""));
+          const price = parseInt(item.price);
           return sum + price * (item.quantity || 1);
         }, 0),
         paymentMethod: "Cash on Delivery",
@@ -228,20 +225,24 @@ const Checkout = () => {
       });
 
       const data = await response.json();
-      console.log("Order placed successfully:", data);
-      toast("Order placed successfully!", {
-        style: {
-          background: "#fff",
-          color: "#000",
-          border: "1px solid #ddd",
-        },
-      });
+      if(data.success == true){
+        console.log("Order placed successfully:", data);
+        toast("Order placed successfully!", {
+          style: {
+            background: "#fff",
+            color: "#000",
+            border: "1px solid #ddd",
+          },
+        });
+        navigate("/")
+    clearCart();
+
+      }
+   
     } catch (error) {
       console.error("Error placing order:", error);
     }
 
-    clearCart();
-    navigate("/");
   };
 
   useEffect(() => {
@@ -263,7 +264,7 @@ const Checkout = () => {
           >
             + Add New Address
           </button>
-          {profileData?.addresses.map((address, index) => (
+          {profileData?.addresses?.map((address, index) => (
             <div
               key={index}
               className={`border rounded-lg p-4 mt-8 mb-4 ${
@@ -329,7 +330,7 @@ const Checkout = () => {
                         <p className="text-gray-600">
                           Quantity: {item.quantity}
                         </p>
-                        <p className="text-green-600 text-sm">
+                        {/* <p className="text-green-600 text-sm">
                           Delivery by{" "}
                           {new Date().toLocaleDateString("en-US", {
                             weekday: "short",
@@ -337,7 +338,7 @@ const Checkout = () => {
                             day: "numeric",
                           })}{" "}
                           | Free
-                        </p>
+                        </p> */}
                       </div>
                       <p className="font-semibold">
                         ₹{parseFloat(item.price) * item.quantity}
@@ -346,7 +347,7 @@ const Checkout = () => {
                   </div>
                 ))}
 
-                <div className="flex justify-between items-center border-t pt-4">
+                {/* <div className="flex justify-between items-center border-t pt-4">
                   <div className="flex-grow">
                     <p className="font-semibold">Total Amount</p>
                     <div className="mt-4">
@@ -361,7 +362,7 @@ const Checkout = () => {
                       />
                     </div>
                   </div>
-                </div>
+                </div> */}
                 <div className="text-right">
                   <p className="font-semibold mb-4">
                     ₹

@@ -6,7 +6,11 @@ import express from "express";
 import dotenv from "dotenv";
 import {connectDB} from "./config/db.js";
 import cors from "cors";
-import orderRoutes from "./routes/orders.js"
+import orderRoutes from "./routes/orders.js";
+import authRoutes from "./routes/auth.js";
+import productRoutes from "./routes/product.js";
+import wishlistRoutes from "./routes/wishlist.js";
+import path from 'path';
 // Load env vars
 dotenv.config();
 
@@ -19,11 +23,14 @@ connectDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Routes
 // const orderRoutes = require('./routes/orders');
-
+app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

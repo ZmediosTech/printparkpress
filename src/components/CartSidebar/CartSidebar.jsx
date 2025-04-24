@@ -6,7 +6,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
   const { cartItems, removeFromCart } = useCart();
 
   const total = cartItems.reduce((sum, item) => {
-    const price = parseInt(item.price.replace('Rs.', ''));
+    const price = parseInt(item.price);
     return sum + price * (item.quantity || 1);
   }, 0);
 

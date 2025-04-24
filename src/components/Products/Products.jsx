@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { FaShoppingCart, FaHeart, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ export const ProductsData = [
     id: 1,
     img: Img1,
     title: "Bhringraj Hair Oil",
-    price: "Rs.900",
+    price: "900",
     rating: 4,
     aosDelay: "0",
     description:
@@ -22,7 +22,7 @@ export const ProductsData = [
     id: 2,
     img: Img2,
     title: "Rosemary Hair Oil",
-    price: "Rs.800",
+    price: "800",
     aosDelay: "200",
     description:
       "Rosemary oil stimulates circulation and promotes hair growth. Its antioxidant and antimicrobial properties reduce dandruff and strengthen hair strands for long-lasting shine.",
@@ -31,7 +31,7 @@ export const ProductsData = [
     id: 3,
     img: Img3,
     title: "Tea Tree Shampoo",
-    price: "Rs.700",
+    price: "700",
     aosDelay: "400",
     description:
       "Tea tree shampoo helps control dandruff, soothes the scalp, and removes buildup. Its antifungal properties balance scalp health and refresh oily hair.",
@@ -40,7 +40,7 @@ export const ProductsData = [
     id: 4,
     img: Img4,
     title: "Rosemary Water",
-    price: "Rs.600",
+    price: "600",
     aosDelay: "600",
     description:
       "Rosemary water supports hair growth, reduces dandruff, and strengthens hair roots. It improves scalp circulation and restores smoothness and shine.",
@@ -50,12 +50,13 @@ export const ProductsData = [
 const Products = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
+  console.log(wishlist,"wishlist")
   const [showPopup, setShowPopup] = useState(false);
   const [addedItem, setAddedItem] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { addToCart } = useCart();
   const [showModal, setShowModal] = useState(false);
-
+  const [products, setProducts] = useState([]);
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
     addToCart(product);
@@ -64,18 +65,40 @@ const Products = () => {
     setTimeout(() => setShowPopup(false), 5000);
   };
 
-  const handleWishlist = (e, product) => {
-    e.stopPropagation();
-    const exists = wishlist.find((item) => item.id === product.id);
-    setWishlist(exists ? wishlist.filter((item) => item.id !== product.id) : [...wishlist, product]);
+  const handleWishlist =async (e, product) => {
+    const data = await fetch(`http://localhost:5000/api/wishlist/${email}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(product),
+    });
+    
   };
 
   const handleProductClick = (e, data) => {
     e.stopPropagation();
     setSelectedProduct(data);
     setShowModal(true);
-    navigate(`/product/${data.id}`);
+    navigate(`/product/${data._id}`);
   };
+  const fetchProducts = async ()=>{
+    try {
+      const response = await fetch("http://localhost:5000/api/products");
+      const data = await response.json();
+      if (response.ok) {
+        setProducts(data.data);
+      } else {
+        console.error("Error fetching products:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  }
+
+  useEffect(()=>{
+   fetchProducts()
+  },[])
 
   return (
     <div className="mt-14 mb-12 relative px-4 sm:px-6 lg:px-10 bg-gradient-to-b from-orange-50 to-white">
@@ -129,7 +152,7 @@ const Products = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 place-items-center">
-          {ProductsData.map((data) => (
+          {products.map((data) => (
             <div
               key={data.id}
               className="bg-white cursor-pointer rounded-3xl p-6 w-full max-w-xs shadow-xl transition-all duration-500 hover:scale-105 hover:shadow-2xl relative group backdrop-blur-sm border border-orange-100"
@@ -137,7 +160,9 @@ const Products = () => {
             >
               <div className="relative overflow-hidden rounded-2xl mb-6">
                 <img 
-                  src={data.img} 
+                  src={
+                    `http://localhost:5000${data.imageUrl}`
+                  } 
                   alt={data.title} 
                   className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110" 
                 />
@@ -145,7 +170,7 @@ const Products = () => {
               </div>
               
               <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-4 text-center">
-                {data.price}
+                Rs {data.price}
               </p>
               
               <div className="text-center">

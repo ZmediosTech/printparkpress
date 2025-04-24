@@ -52,6 +52,10 @@ const orderSchema = new mongoose.Schema({
       type: Number,
       required: true,
       min: 1
+    },
+    image:{
+      type: String,
+      required: true
     }
   }],
   totalAmount: {

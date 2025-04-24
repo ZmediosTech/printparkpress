@@ -111,7 +111,7 @@ const Navbar = ({ handleOrderPopup }) => {
       <div className="px-4 py-3 text-sm border-b border-gray-100">
       <span className="text-gray-600">New customer? </span>
       <button 
-        onClick={() => setIsSignupOpen(true)}
+        onClick={() => navigate("/signup")}
         className="text-blue-500 hover:text-blue-700 font-medium"
       >
         Sign Up
