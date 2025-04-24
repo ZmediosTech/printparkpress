@@ -187,6 +187,10 @@ const Checkout = () => {
       toast.error("Please select a delivery address");
       return;
     }
+    if(email == undefined || email == null){
+      toast.error("Please login to place an order");
+      return;
+    }
 
     try {
       const selected = profileData.addresses[selectedAddressIndex];
