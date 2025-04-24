@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, {useState, useEffect,useRef} from "react";
+import { toast } from 'react-hot-toast';
 import Cart from '../Cart/Cart.jsx';
 import Logo from "../../assets/logo.jpeg";
 import { IoMdSearch } from "react-icons/io";
@@ -43,7 +44,10 @@ const Menu = [
 ];
 
 const Navbar = ({ handleOrderPopup }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const navigate = useNavigate();
@@ -63,10 +67,23 @@ const Navbar = ({ handleOrderPopup }) => {
       }
     }
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <>
     <nav className="shadow-sm w-full">
+      
       <div className="shadow-md bg-orange-300 dark:bg-gray-900 dark:text-white duration-200  relative z-40">
         <CartSidebar 
           isOpen={isCartOpen}
@@ -93,57 +110,81 @@ const Navbar = ({ handleOrderPopup }) => {
                 <SearchBar products={ProductsData} />
               </div>
 
-                         {/*profile*/}
-                         <div className="relative">
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="p-2 hover:text-orange-500 transition-colors flex items-center gap-1"
-                  >
-                    <FaUser className="text-xl text-gray-700 dark:text-white" />
-                    <FaCaretDown className="text-sm text-gray-700 dark:text-white" />
-                  </button>
-                </div>
+                   {/*profile*/}
+<div className="relative" ref={profileMenuRef}>
+  <div className="flex items-center gap-2">
+    <button 
+      onClick={() => setShowProfileMenu(!showProfileMenu)}
+      className="p-2 hover:text-orange-500 transition-colors flex items-center gap-1"
+    >
+      <FaUser className="text-xl text-gray-700 dark:text-white" />
+      <FaCaretDown className="text-sm text-gray-700 dark:text-white" />
+    </button>
+  </div>
 
-        {/* Dropdown content */}
-        {showProfileMenu && (
-  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
+  {/* Dropdown content */}
+  {showProfileMenu && (
+    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
       <div className="px-4 py-3 text-sm border-b border-gray-100">
-      <span className="text-gray-600">New customer? </span>
-      <button 
-        onClick={() => navigate("/signup")}
-        className="text-blue-500 hover:text-blue-700 font-medium"
+        <span className="text-gray-600">New customer? </span>
+        <button 
+          onClick={() => {
+            setShowProfileMenu(false);
+            navigate("/signup");
+          }}
+          className="text-blue-500 hover:text-blue-700 font-medium"
+        >
+          Sign Up
+        </button>
+      </div>
+      <Link
+        to="/profile"
+        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        onClick={() => setShowProfileMenu(false)}
       >
-        Sign Up
-      </button>
+        <span className="text-blue-500 mr-3 text-lg">○</span>
+        <span className="font-medium">My Profile</span>
+      </Link>
+      <Link
+        to="/myOrders"
+        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        onClick={() => setShowProfileMenu(false)}
+      >
+        <span className="text-blue-500 mr-3 text-lg">○</span>
+        <span className="font-medium">My Orders</span>
+      </Link>
+      <Link
+        to="/wishlist"
+        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        onClick={() => setShowProfileMenu(false)}
+      >
+        <span className="text-blue-500 mr-3 text-lg">○</span>
+        <span className="font-medium">My Wishlist</span>
+      </Link>
+      {/* <Link
+        to="/wishlist"
+        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+        onClick={() => {
+          setShowProfileMenu(false);
+          toast.success('Added to Wishlist!', {
+            icon: '❤️',
+            style: {
+              borderRadius: '10px',
+              background: '#333',
+              color: '#fff',
+            },
+            duration: 1500,
+            position: 'top-center',
+          });
+        }}
+      >
+        <span className="text-blue-500 mr-3 text-lg">○</span>
+        <span className="font-medium">My Wishlist</span>
+      </Link> */}
     </div>
-                    <Link
-                      to="/profile"
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <span className="text-blue-500 mr-3 text-lg">○</span>
-                      <span className="font-medium">My Profile</span>
-                    </Link>
-                    <Link
-                      to="/myOrders"
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <span className="text-blue-500 mr-3 text-lg">○</span>
-                      <span className="font-medium">My Orders</span>
-                    </Link>
-                    <Link
-                      to="/wishlist"
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <span className="text-blue-500 mr-3 text-lg">○</span>
-                      <span className="font-medium">My Wishlist</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
+    
+  )}
+</div>
        
 
 {/* Cart Button */}

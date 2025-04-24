@@ -6,7 +6,7 @@ import Img1 from "../../assets/women/BhringrajP.jpg";
 import Img2 from "../../assets/women/RosemaryP.jpg";
 import Img3 from "../../assets/women/TeaTreeP.jpg";
 import Img4 from "../../assets/women/RosemaryWaterP.jpg";
-
+import { toast } from 'react-hot-toast';
 export const ProductsData = [
   {
     id: 1,
@@ -49,7 +49,7 @@ export const ProductsData = [
 
 const Products = () => {
   const navigate = useNavigate();
-  const [wishlist, setWishlist] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState(new Set());
   const [showPopup, setShowPopup] = useState(false);
   const [addedItem, setAddedItem] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -70,15 +70,69 @@ const Products = () => {
     setTimeout(() => setShowPopup(false), 5000);
   };
 
-  const handleWishlist =async (e, product) => {
-    const data = await fetch(`http://localhost:5000/api/wishlist/user/${email}/items`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(product),
-    });
-    
+  const handleWishlist = async (e, product) => {
+    e.stopPropagation();
+    if (!email) {
+      toast.error('Please login to add items to wishlist', {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+         position: 'top-right'
+      });
+      return;
+    }
+  
+    try {
+      const productId = product._id || product.id;
+      const data = await fetch(`http://localhost:5000/api/wishlist/user/${email}/items`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      });
+      
+      if (data.ok) {
+        setWishlistItems(prev => {
+          const newSet = new Set(prev);
+          newSet.add(productId);
+          return newSet;
+        });
+        toast.success('Item added to wishlist!', {
+          icon: '❤️',
+          style: {
+            borderRadius: '10px',
+            background: '#FF6B6B',
+            color: '#fff',
+            padding: '16px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+          },
+          duration: 2000,
+          position: 'top-right',
+        });
+       
+      } else {
+        toast.error('Item is already in wishlist', {
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+          position: 'top-right' 
+        });
+      }
+    } catch (error) {
+      toast.error('Error adding to wishlist', {
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+         position: 'top-right'
+      });
+    }
   };
 
   const handleProductClick = (e, data) => {
@@ -195,15 +249,15 @@ const Products = () => {
                     <span>Add to Cart</span>
                   </button>
                   <button
-                    onClick={(e) => handleWishlist(e, data)}
-                    className={`p-3 rounded-full transition-all duration-300 shadow-lg ${
-                      wishlist.find((item) => item.id === data.id)
-                        ? "bg-red-500 text-white shadow-red-300/50"
-                        : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-red-300/50"
-                    }`}
-                  >
-                    <FaHeart className="text-lg" />
-                  </button>
+  onClick={(e) => handleWishlist(e, data)}
+  className={`p-3 rounded-full transition-all duration-300 shadow-lg ${
+    wishlistItems.has(data._id || data.id)
+      ? "bg-red-500 text-white shadow-red-300/50"
+      : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-red-300/50"
+  }`}
+>
+  <FaHeart className="text-lg" />
+</button>
                 </div>
             </div>
           ))}
