@@ -18,7 +18,7 @@ const MyOrders = () => {
         setOrders(data.data || []);
       }
       else {
-        toast.error(data.message || 'No orders found');
+        // toast.error(data.message || 'No orders found');
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -65,7 +65,7 @@ const MyOrders = () => {
               <div className="border-b p-4 bg-gray-50">
                 <div className="flex justify-between items-center">
                   <p className="text-gray-600">Order ID: {order._id}</p>
-                  <p className="text-green-600 font-medium">
+                  {/* <p className="text-green-600 font-medium">
                     {order.status === 'delivered' ? (
                       `Delivered on ${new Date(order.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric',
@@ -75,7 +75,7 @@ const MyOrders = () => {
                     ) : (
                       `Status: ${order.status || 'Processing'}`
                     )}
-                  </p>
+                  </p> */}
                 </div>
               </div>
               

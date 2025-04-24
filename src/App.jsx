@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import MyOrders from "./components/MyOrders/MyOrders";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
@@ -35,6 +35,7 @@ function App() {
   const handleOrderPopup = () => {
     setOrderPopup(!orderPopup);
   };
+  const location = useLocation();
 
   useEffect(() => {
     try {
@@ -53,15 +54,18 @@ function App() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <Router>
+
       <AuthProvider>
         <CartProvider>
           <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
-            <Navbar handleOrderPopup={handleOrderPopup} />
-
+            {/* Conditionally render Navbar */}
+            {!["/login", "/signup", "/reset-password"].includes(location.pathname) && (
+              <Navbar handleOrderPopup={handleOrderPopup} />
+            )}
+  
             {/* ✅ Toast Container */}
             <Toaster position="top-right" reverseOrder={false} />
-
+  
             <Routes>
               <Route
                 path="/"
@@ -77,7 +81,7 @@ function App() {
                 }
               />
               <Route path="/cart" element={<CartPage />} />
-              <Route path="/about" element={<About />} /> 
+              <Route path="/about" element={<About />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/product/:id" element={<ProductDetail />} />
@@ -88,14 +92,15 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<div className="text-center py-20 text-xl">404 - Page Not Found</div>} />
             </Routes>
-
-            <Footer />
+  
+            {/* Conditionally render Footer */}
+            {!["/login", "/signup", "/reset-password"].includes(location.pathname) && <Footer />}
             <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
           </div>
         </CartProvider>
       </AuthProvider>
-    </Router>
   );
+  
 }
 
 export default App;

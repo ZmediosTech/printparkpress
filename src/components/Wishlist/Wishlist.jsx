@@ -23,6 +23,7 @@ const Wishlist = () => {
   let email = localStorage.getItem("email");
 
   const fetchWishlist = async () => {
+    setLoading(true)
     try {
       const response = await fetch(
         `http://localhost:5000/api/wishlist/user/${email}`
@@ -63,7 +64,7 @@ const Wishlist = () => {
 
   const handleAddToCart = (product) => {
     addToCart({
-      id: product._id,
+      _id: product._id,
       title: product.name,
       price: product.price,
       imageUrl: product.imageUrl,

@@ -47,9 +47,11 @@ const Navbar = ({ handleOrderPopup }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
   const { cartItems } = useCart();
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  let email = localStorage.getItem("email");
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -80,7 +82,7 @@ const Navbar = ({ handleOrderPopup }) => {
 
                       {/* Logo */}
                       <div className="flex items-center">
-              <Link to="/" className="font-bold flex items-center text-2xl sm:text-3xl flex items-center gap-3">
+              <Link to="/" className="font-bold  text-2xl sm:text-3xl flex items-center gap-3">
                 <img src={Logo} alt="Logo" className="w-14 h-14 object-contain" />
                 <span className="text-gray-800 dark:text-white">Glowriti</span>
               </Link>
@@ -89,9 +91,9 @@ const Navbar = ({ handleOrderPopup }) => {
             {/* Right Side Items */}
             <div className="flex items-center space-x-6">
               {/* Search Bar */}
-              <div className="w-[300px] mx-4">
+              {/* <div className="w-[300px] mx-4">
                 <SearchBar products={ProductsData} />
-              </div>
+              </div> */}
 
                          {/*profile*/}
                          <div className="relative">
@@ -107,45 +109,62 @@ const Navbar = ({ handleOrderPopup }) => {
 
         {/* Dropdown content */}
         {showProfileMenu && (
-  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg py-2 z-50 border border-gray-100">
-      <div className="px-4 py-3 text-sm border-b border-gray-100">
-      <span className="text-gray-600">New customer? </span>
-      <button 
-        onClick={() => navigate("/signup")}
-        className="text-blue-500 hover:text-blue-700 font-medium"
-      >
-        Sign Up
-      </button>
-    </div>
-                    <Link
-                      to="/profile"
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <span className="text-blue-500 mr-3 text-lg">○</span>
-                      <span className="font-medium">My Profile</span>
-                    </Link>
-                    <Link
-                      to="/myOrders"
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <span className="text-blue-500 mr-3 text-lg">○</span>
-                      <span className="font-medium">My Orders</span>
-                    </Link>
-                    <Link
-                      to="/wishlist"
-                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      onClick={() => setShowProfileMenu(false)}
-                    >
-                      <span className="text-blue-500 mr-3 text-lg">○</span>
-                      <span className="font-medium">My Wishlist</span>
-                    </Link>
-                  </div>
-                )}
-              </div>
-       
+  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow-lg py-2 z-50 border border-gray-100 dark:border-gray-700">
+    {!email ? (
+      <div className="px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-600">
+        <span>New customer? </span>
+        <button 
+          onClick={() => {
+            setShowProfileMenu(false);
+            navigate("/login")
+          }}
+          className="text-blue-500 hover:text-blue-700 font-medium"
+        >
+          Login
+        </button>
+      </div>
+    ) : (
+      <>
+        <div className="px-4 py-3 text-sm border-b border-gray-200 dark:border-gray-600">
+          <span>Welcome</span>
+        </div>
+        <Link
+          to="/profile"
+          onClick={() => setShowProfileMenu(false)}
+          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          My Profile
+        </Link>
+        <Link
+          to="/myOrders"
+          onClick={() => setShowProfileMenu(false)}
+          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          My Orders
+        </Link>
+        <Link
+          to="/wishlist"
+          onClick={() => setShowProfileMenu(false)}
+          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          My Wishlist
+        </Link>
+        <button
+          onClick={() => {
+          localStorage.removeItem("email");
+            setShowProfileMenu(false);
+          }}
+          className="w-full text-left px-4 py-2 text-red-500 hover:text-red-700 dark:hover:text-red-400"
+        >
+          Logout
+        </button>
+      </>
+    )}
+  </div>
+)}
 
+       
+</div>
 {/* Cart Button */}
 <div className="relative inline-flex">
   <button
