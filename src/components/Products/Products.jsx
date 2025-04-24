@@ -50,17 +50,22 @@ export const ProductsData = [
 const Products = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState([]);
-  console.log(wishlist,"wishlist")
   const [showPopup, setShowPopup] = useState(false);
   const [addedItem, setAddedItem] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const { addToCart } = useCart();
   const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
+
+  const { addToCart, cartItems } = useCart();
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
-    addToCart(product);
-    setAddedItem(product);
+    const productToAdd = {
+      ...product,
+      id: product._id || product.id, // Handle both API and local products
+      quantity: 1 
+    };
+    addToCart(productToAdd);
+    setAddedItem(productToAdd);
     setShowPopup(true);
     setTimeout(() => setShowPopup(false), 5000);
   };

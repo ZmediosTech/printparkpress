@@ -114,10 +114,10 @@ const Checkout = () => {
       locality: "",
       cityDistrict: "",
       addressType: "Home",
-      weekends: {
-        saturday: false,
-        sunday: false,
-      },
+      // weekends: {
+      //   saturday: false,
+      //   sunday: false,
+      // },
       isDefault: false,
     });
     setShowAddressForm(true);
@@ -322,12 +322,17 @@ const Checkout = () => {
                 {cartItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex justify-between items-start border-b pb-4 mb-4"
+                    className="flex items-center gap-4 border-b pb-4 mb-4"
                   >
+                     <img
+                      src={`http://localhost:5000${item.imageUrl}`}
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
                     <div className="flex-grow">
                       <div>
-                        <h4 className="font-medium">{item.title}</h4>
-                        <p className="text-gray-600">
+                        <h4 className="font-medium text-lg text-gray-800 mb-1">{item.name}</h4>
+                        <p className="text-gray-600 text-sm">
                           Quantity: {item.quantity}
                         </p>
                         {/* <p className="text-green-600 text-sm">
@@ -340,7 +345,7 @@ const Checkout = () => {
                           | Free
                         </p> */}
                       </div>
-                      <p className="font-semibold">
+                      <p className="font-semibold text-orange-500 mt-2">
                         ₹{parseFloat(item.price) * item.quantity}
                       </p>
                     </div>
@@ -457,7 +462,7 @@ const Checkout = () => {
                 className="border p-2 rounded-md w-full"
                 required
               />
-              <div className="space-y-3">
+              {/* <div className="space-y-3">
                 <p className="font-medium">Type of Address *</p>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
@@ -513,7 +518,7 @@ const Checkout = () => {
                   onChange={handleAddressChange}
                 />
                 Make this as my default address
-              </label>
+              </label> */}
               <div className="flex justify-end gap-4 mt-6">
                 <button
                   type="button"

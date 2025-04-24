@@ -21,15 +21,15 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('savedItems', JSON.stringify(savedItems));
   }, [savedItems]);
   
-  const removeFromCart = (product) => {
-    setCartItems(cartItems.filter(item => item.title !== product.title));
+  const removeFromCart = (productId) => {
+    setCartItems(cartItems.filter(item => item._id !== productId));
   };
   
   const addToCart = (product) => {
-    const existingProduct = cartItems.find(item => item.title === product.title);
+    const existingProduct = cartItems.find(item => item._id === product._id);
     if (existingProduct) {
       setCartItems(cartItems.map(item => 
-        item.title === product.title 
+        item._id === product._id 
           ? {...item, quantity: (item.quantity || 1) + 1}
           : item
       ));
@@ -38,15 +38,19 @@ export const CartProvider = ({ children }) => {
     }
   };
   
+  
   const updateQuantity = (product, newQuantity) => {
     if (newQuantity < 1) {
       removeFromCart(product);
       return;
     }
+    const removeFromCart = (productId) => {
+      setCartItems(cartItems.filter(item => item.id !== productId));
+    };
     
     setCartItems(prevItems => 
       prevItems.map(item => 
-        item.title === product.title
+        item.id === product.id
           ? { ...item, quantity: newQuantity }
           : item
       )
@@ -56,7 +60,7 @@ export const CartProvider = ({ children }) => {
   const incrementQuantity = (product) => {
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.title === product.title
+        item.id=== product.id
           ? { ...item, quantity: (item.quantity || 1) + 1 }
           : item
       )
@@ -64,7 +68,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const decrementQuantity = (product) => {
-    const item = cartItems.find(item => item.title === product.title);
+    const item = cartItems.find(item => item.id === product.id);
     if (item && (item.quantity || 1) <= 1) {
       removeFromCart(product);
       return;
@@ -72,7 +76,7 @@ export const CartProvider = ({ children }) => {
     
     setCartItems(prevItems =>
       prevItems.map(item =>
-        item.title === product.title
+        item.id === product.id
           ? { ...item, quantity: (item.quantity || 1) - 1 }
           : item
       )

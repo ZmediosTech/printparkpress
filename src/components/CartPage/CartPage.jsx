@@ -92,14 +92,14 @@ const CartPage = () => {
                       </div>
 
                       <div className="flex items-center gap-4">
-                        <button
+                        {/* <button
                           onClick={() => saveForLater(item)}
                           className="text-blue-600 hover:text-blue-800"
                         >
                           SAVE FOR LATER
-                        </button>
+                        </button> */}
                         <button
-                          onClick={() => removeFromCart(item)}
+                          onClick={() => removeFromCart(item.id)}
                           className="text-red-500 hover:text-red-700"
                         >
                           REMOVE
