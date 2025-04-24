@@ -6,7 +6,7 @@ const router = express.Router();
 // GET wishlist items by user email
 router.get('/user/:email', async (req, res) => {
   try {
-    const wishlist = await Wishlist.findOne({ userEmail: req.params.email }).populate('items.productId');
+    const wishlist = await Wishlist.findOne({ userEmail: req.params.email }).populate('items._id');
 
     if (!wishlist) {
       return res.status(404).json({
@@ -15,9 +15,15 @@ router.get('/user/:email', async (req, res) => {
       });
     }
 
+    // Flatten the items so each item merges addedAt with populated product details
+    const formattedItems = wishlist.items.map(item => ({
+      ...item._id.toObject(), // the populated product details
+      addedAt: item.addedAt   // merge addedAt at top level
+    }));
+
     res.status(200).json({
       success: true,
-      data: wishlist.items
+      data: formattedItems
     });
   } catch (error) {
     res.status(500).json({
@@ -27,12 +33,13 @@ router.get('/user/:email', async (req, res) => {
   }
 });
 
+
 // Add item to wishlist
 router.post('/user/:email/items', async (req, res) => {
   try {
-    const { productId } = req.body; // Ensure you're sending a productId in the request body
+    const { _id } = req.body; // Ensure you're sending a productId in the request body
 
-    if (!productId) {
+    if (!_id) {
       return res.status(400).json({
         success: false,
         error: 'Product ID is required'
@@ -51,7 +58,7 @@ router.post('/user/:email/items', async (req, res) => {
     }
 
     // Check if item already exists in wishlist
-    const existingItem = wishlist.items.find(item => item.productId.toString() === productId);
+    const existingItem = wishlist.items.find(item => item._id.toString() === _id);
 
     if (existingItem) {
       return res.status(400).json({
@@ -61,7 +68,7 @@ router.post('/user/:email/items', async (req, res) => {
     }
 
     // Add new item to wishlist
-    wishlist.items.push({ productId });
+    wishlist.items.push({ _id });
 
     // Save the updated wishlist
     await wishlist.save();
@@ -80,7 +87,7 @@ router.post('/user/:email/items', async (req, res) => {
 });
 
 // Remove item from wishlist
-router.delete('/user/:email/items/:productId', async (req, res) => {
+router.delete('/user/:email/remove/:productId', async (req, res) => {
   try {
     const { email, productId } = req.params;
 
@@ -95,7 +102,7 @@ router.delete('/user/:email/items/:productId', async (req, res) => {
     }
 
     // Find the item in the wishlist and remove it
-    const itemIndex = wishlist.items.findIndex(item => item.productId.toString() === productId);
+    const itemIndex = wishlist.items.findIndex(item => item._id.toString() === productId);
 
     if (itemIndex === -1) {
       return res.status(404).json({

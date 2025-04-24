@@ -55,7 +55,7 @@ const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
-
+  let email = localStorage.getItem("email")
   const { addToCart, cartItems } = useCart();
   const handleAddToCart = (e, product) => {
     e.stopPropagation();
@@ -71,7 +71,7 @@ const Products = () => {
   };
 
   const handleWishlist =async (e, product) => {
-    const data = await fetch(`http://localhost:5000/api/wishlist/${email}`, {
+    const data = await fetch(`http://localhost:5000/api/wishlist/user/${email}/items`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -161,8 +161,9 @@ const Products = () => {
             <div
               key={data.id}
               className="bg-white cursor-pointer rounded-3xl p-6 w-full max-w-xs shadow-xl transition-all duration-500 hover:scale-105 hover:shadow-2xl relative group backdrop-blur-sm border border-orange-100"
-              onClick={(e) => handleProductClick(e, data)}
+             
             >
+              <div onClick={(e) => handleProductClick(e, data)} className="group relative overflow-hidden rounded-2xl mb-6">
               <div className="relative overflow-hidden rounded-2xl mb-6">
                 <img 
                   src={
@@ -183,7 +184,8 @@ const Products = () => {
                 <p className="text-gray-600 text-sm mb-6 line-clamp-2">
                   {data.description}
                 </p>
-                
+              </div> 
+              </div> 
                 <div className="flex justify-center gap-4">
                   <button
                     onClick={(e) => handleAddToCart(e, data)}
@@ -203,7 +205,6 @@ const Products = () => {
                     <FaHeart className="text-lg" />
                   </button>
                 </div>
-              </div>
             </div>
           ))}
         </div>

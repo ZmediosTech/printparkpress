@@ -203,8 +203,8 @@ const Checkout = () => {
           },
         },
         products: cartItems.map((item) => ({
-          productId: item._id,
-          name: item.name,
+          productId: item._id || item.id,
+          name: item.name || item.title,
           price: parseInt(item.price),
           image: item.imageUrl,
           quantity: item.quantity || 1,
