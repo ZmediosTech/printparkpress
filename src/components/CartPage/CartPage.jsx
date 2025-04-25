@@ -59,11 +59,12 @@ const CartPage = () => {
                 key={item.id}
                 className="flex items-start gap-4 border-b pb-4"
               >
-                <img
-                  src={`http://localhost:5000${item.imageUrl}`}
-                  alt={item.title}
-                  className="w-24 h-24 object-cover rounded"
-                />
+             <img
+  src={`${import.meta.env.VITE_API_URL}/${item.imageUrl}`}
+  alt={item.title}
+  className="w-24 h-24 object-cover rounded"
+/>
+
                 <div className="flex-1">
                   <p className="font-semibold">{item.title || item.name}</p>
                   <p className="text-gray-600 mt-1">Rs. {item.price}</p>
