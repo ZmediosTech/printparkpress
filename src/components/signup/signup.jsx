@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -10,7 +11,10 @@ const Signup = () => {
     confirmPassword: ''
   });
   const [errors, setErrors] = useState({});
-const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -69,8 +73,8 @@ const navigate = useNavigate()
     });
 
     const data = await response.json();
-    if(data.success){
-      toast.success("Signup successful ");
+    if (data.success) {
+      toast.success("Signup successful");
       setFormData({
         username: '',
         email: '',
@@ -78,9 +82,8 @@ const navigate = useNavigate()
         confirmPassword: ''
       });
       setErrors({});
-      navigate("/login")
+      navigate("/login");
     }
-    // handle response
   };
 
   return (
@@ -88,22 +91,74 @@ const navigate = useNavigate()
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <h2 className="text-center text-3xl font-bold text-gray-800 mb-6">Create an Account</h2>
         <form onSubmit={handleSubmit} className="space-y-5">
-          {['username', 'email', 'password', 'confirmPassword'].map((field) => (
-            <div key={field}>
-              <input
-                id={field}
-                name={field}
-                type={field.includes('password') ? 'password' : field}
-                placeholder={field === 'confirmPassword' ? 'Confirm Password' : field.charAt(0).toUpperCase() + field.slice(1)}
-                value={formData[field]}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border ${
-                  errors[field] ? 'border-red-400' : 'border-gray-300'
-                } rounded-md focus:ring-2 focus:ring-primary focus:outline-none`}
-              />
-              {errors[field] && <p className="text-red-500 text-xs mt-1">{errors[field]}</p>}
-            </div>
-          ))}
+
+          {/* Username */}
+          <div>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 border ${errors.username ? 'border-red-400' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-primary focus:outline-none`}
+            />
+            {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 border ${errors.email ? 'border-red-400' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-primary focus:outline-none`}
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+          </div>
+
+          {/* Password */}
+          <div className="relative">
+            <input
+              id="password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 border ${errors.password ? 'border-red-400' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-primary focus:outline-none`}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+          </div>
+
+          {/* Confirm Password */}
+          <div className="relative">
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={`w-full px-4 py-2 border ${errors.confirmPassword ? 'border-red-400' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-primary focus:outline-none`}
+            />
+            <span
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
+            >
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+          </div>
 
           <button
             type="submit"

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -8,6 +9,7 @@ const Login = () => {
   const [apiError, setApiError] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -27,7 +29,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, password: formData.password })
@@ -35,10 +37,9 @@ const Login = () => {
       const data = await response.json();
       if (data.success === true) {
         toast.success("Login successful");
+        localStorage.setItem("email", data.user?.email);
+        localStorage.setItem("token", data.token);
         navigate("/");
-        localStorage.setItem("email",data.user?.email)
-
-        localStorage.setItem("token",data.token)
       } else {
         toast.error(data.message || "Login failed!");
       }
@@ -80,7 +81,7 @@ const Login = () => {
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
         <h2 className="text-center text-3xl font-bold text-gray-800 mb-6">Welcome Back</h2>
         {apiError && <p className="text-red-500 text-sm mb-4 text-center">{apiError}</p>}
-        
+
         {!showResetForm ? (
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
@@ -95,18 +96,27 @@ const Login = () => {
               />
               {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
-            <div>
+
+            {/* Password field with toggle icon */}
+            <div className="relative">
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border ${errors.password ? 'border-red-400' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-primary focus:outline-none`}
               />
+              <span
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
+
             <div className="flex justify-end">
               <button
                 type="button"
@@ -116,6 +126,7 @@ const Login = () => {
                 Forgot password?
               </button>
             </div>
+
             <button type="submit" className="w-full bg-primary text-white py-2 rounded-md hover:bg-secondary transition-all duration-300 font-medium">
               Login
             </button>
