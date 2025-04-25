@@ -36,27 +36,7 @@ const Admin = () => {
       console.error("Error fetching orders:", error);
     }
   };
-  // const fetchUsers = async () => {
-  //   try {
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
-  //     const data = await response.json();
-  //     if (data.success) {
-  //       setUsers(data.data || []);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching users:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-8">
@@ -71,19 +51,7 @@ const Admin = () => {
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
-            {/* <div className="bg-gradient-to-r from-primary to-secondary p-4 sm:p-6 rounded-lg text-white">
-              <div className="flex items-center">
-                <FaUsers className="text-3xl sm:text-4xl" />
-                <div className="ml-4">
-                  <p className="text-base sm:text-lg font-semibold">
-                    Total Users
-                  </p>
-                  <p className="text-2xl sm:text-3xl font-bold">
-                    {users.length}
-                  </p>
-                </div>
-              </div>
-            </div> */}
+          
             <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-4 sm:p-6 rounded-lg text-white">
               <div className="flex items-center">
                 <FaShoppingBag className="text-3xl sm:text-4xl" />
@@ -97,6 +65,23 @@ const Admin = () => {
                 </div>
               </div>
             </div>
+              {/* Total Contacts Card */}
+           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 sm:p-6 rounded-lg text-white">
+           <div className="flex items-center">
+      <FaUsers className="text-3xl sm:text-4xl" />
+      <div className="ml-4">
+        <p className="text-base sm:text-lg font-semibold">
+          Total Contacts
+        </p>
+        <p className="text-2xl sm:text-3xl font-bold">
+          {contactData.length}
+        </p>
+      </div>
+    </div>
+         </div>
+         
+          </div>
+
           </div>
 
           {/* Orders Section */}
@@ -247,7 +232,7 @@ const Admin = () => {
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 
