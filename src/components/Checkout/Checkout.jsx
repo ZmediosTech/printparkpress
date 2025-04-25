@@ -189,6 +189,7 @@ const Checkout = () => {
     }
     if(email == undefined || email == null){
       toast.error("Please login to place an order");
+      setShowPaymentOptions(false);
       return;
     }
 

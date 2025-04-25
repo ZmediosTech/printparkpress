@@ -24,7 +24,7 @@ const FooterLinks = [
   { title: "Home", link: "home" },
   { title: "About", link: "about" },
   { title: "Contact", link: "contact" },
-  { title: "Blog", link: "blog" },
+  // { title: "Blog", link: "blog" },
 ];
 
 const Footer = () => {
@@ -49,14 +49,17 @@ const Footer = () => {
         phone: formData.phone,
         message: formData.message,
       };
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(contactData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/contact`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(contactData),
+        }
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -91,8 +94,11 @@ const Footer = () => {
                 Glowriti
               </h1>
               <p className="text-gray-300 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum in
-                beatae ea recusandae blanditiis veritatis.
+                Glority is a modern, responsive eCommerce web application
+                designed to provide users with a seamless online shopping
+                experience. Built with a user-friendly interface and secure
+                backend, the platform allows customers to browse a wide range of
+                products, manage their cart, and complete purchases efficiently.
               </p>
             </div>
 

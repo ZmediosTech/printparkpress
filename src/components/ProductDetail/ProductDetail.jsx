@@ -8,18 +8,23 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [product, setProduct] = useState([]);
-
+const [loading, setLoading] = useState(false);
   const fetchSingleProduct = async (id) => {
+    setLoading(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/${id}`);
       const data = await response.json();
       if (response.ok) {
+        setLoading(false);
         setProduct(Array.isArray(data.data) ? data.data : [data.data]);
       } else {
         console.error('Error fetching product:', data.error);
       }
     } catch (error) {
       console.error('Error fetching product:', error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -44,7 +49,7 @@ const ProductDetail = () => {
     return <div className="flex gap-1 mb-4">{stars}</div>;
   };
 
-  if (!product.length) {
+  if (!product.length && !loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Product not found</h2>
@@ -58,6 +63,13 @@ const ProductDetail = () => {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
   return (
     <div className="container mx-auto px-4 py-8">
       {product.map((item) => (

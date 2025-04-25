@@ -57,16 +57,16 @@ const Admin = () => {
     }
   };
   useEffect(() => {
-    checkVerification();
+    //checkVerification();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-8">
@@ -81,20 +81,20 @@ const Admin = () => {
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
-          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 sm:p-6 rounded-lg text-white">
-           <div className="flex items-center">
-      <FaUsers className="text-3xl sm:text-4xl" />
-      <div className="ml-4">
-        <p className="text-base sm:text-lg font-semibold">
-          Total Contacts
-        </p>
-        <p className="text-2xl sm:text-3xl font-bold">
-          {contactData.length}
-        </p>
-      </div>
-    </div>
-         </div>
-         
+            <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 sm:p-6 rounded-lg text-white">
+              <div className="flex items-center">
+                <FaUsers className="text-3xl sm:text-4xl" />
+                <div className="ml-4">
+                  <p className="text-base sm:text-lg font-semibold">
+                    Total Contacts
+                  </p>
+                  <p className="text-2xl sm:text-3xl font-bold">
+                    {contactData.length}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-4 sm:p-6 rounded-lg text-white">
               <div className="flex items-center">
                 <FaShoppingBag className="text-3xl sm:text-4xl" />
@@ -120,9 +120,7 @@ const Admin = () => {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[15%]">
-                      ORDER ID
-                    </th>
+                    {/* <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[15%]">ORDER ID</th> */}
                     <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
                       FULLNAME
                     </th>
@@ -131,6 +129,9 @@ const Admin = () => {
                     </th>
                     <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
                       MOBILE
+                    </th>
+                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[15%]">
+                      ADDRESS
                     </th>
                     <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
                       DATE
@@ -146,9 +147,7 @@ const Admin = () => {
                 <tbody className="divide-y divide-gray-200">
                   {orders.map((order) => (
                     <tr key={order._id} className="hover:bg-gray-50">
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
-                        {order._id}
-                      </td>
+                      {/* <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">{order._id}</td> */}
                       <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
                         {order.user?.fullName || "N/A"}
                       </td>
@@ -157,6 +156,11 @@ const Admin = () => {
                       </td>
                       <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
                         {order.user?.mobile || "N/A"}
+                      </td>
+                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
+                        {order.user?.address?.street} ,
+                        {order.user?.address.city} ,
+                        {order.user?.address.pincode}
                       </td>
                       <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm whitespace-nowrap">
                         {new Date(order.orderDate).toLocaleDateString("en-IN", {
@@ -198,6 +202,56 @@ const Admin = () => {
                           ))}
                         </div>
                       </td>
+                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
+                        <select
+                          value={order.status || "Pending"} // Assuming status field in the order response
+                          onChange={async (e) => {
+                            const newStatus = e.target.value;
+                            setOrders((prevOrders) =>
+                              prevOrders.map((ord) =>
+                                ord._id === order._id
+                                  ? { ...ord, status: newStatus }
+                                  : ord
+                              )
+                            );
+                            // try {
+                            //   // Send update to the API (replace with actual endpoint)
+                            //   const response = await fetch(
+                            //     `http://localhost:5000/api/orders/${order._id}`,
+                            //     {
+                            //       method: "PUT",
+                            //       headers: {
+                            //         "Content-Type": "application/json",
+                            //       },
+                            //       body: JSON.stringify({ status: newStatus }),
+                            //     }
+                            //   );
+                            //   const data = await response.json();
+                            //   if (data.success) {
+                            //     setOrders((prevOrders) =>
+                            //       prevOrders.map((ord) =>
+                            //         ord._id === order._id
+                            //           ? { ...ord, status: newStatus }
+                            //           : ord
+                            //       )
+                            //     );
+                            //   } else {
+                            //     console.error("Error updating status");
+                            //   }
+                            // } catch (error) {
+                            //   console.error(
+                            //     "Error updating order status:",
+                            //     error
+                            //   );
+                            // }
+                          }}
+                          className="bg-gray-50 border border-gray-200 rounded p-2 text-sm"
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Completed">Completed</option>
+                        </select>
+                      </td>
+
                       <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap">
                         ₹
                         {order.products

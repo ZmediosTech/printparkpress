@@ -105,26 +105,28 @@ const Products = () => {
           newSet.add(productId);
           return newSet;
         });
-        toast.success("Item added to wishlist!", {
-          icon: "✅",
-          style: {
-            borderRadius: "12px",
-            background: "linear-gradient(135deg, #38b2ac, #319795)",
-            color: "#ffffff",
-            padding: "14px 20px",
-            fontWeight: "500",
-            fontSize: "16px",
-            boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
-          },
-          duration: 2500,
-          position: "top-right",
-        });
+                toast.success("Item added to wishlist");
+        
+        // toast.success("Item added to wishlist!", {
+        //   icon: "✅",
+        //   style: {
+        //     borderRadius: "12px",
+        //     background: "linear-gradient(135deg, #38b2ac, #319795)",
+        //     color: "#ffffff",
+        //     padding: "14px 20px",
+        //     fontWeight: "500",
+        //     fontSize: "16px",
+        //     boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
+        //   },
+        //   duration: 2500,
+        //   position: "top-right",
+        // });
       } else {
         toast.error("Item is already in wishlist", {
           style: {
             borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
+            // background: "#333",
+            color: "black",
           },
           position: "top-right",
         });

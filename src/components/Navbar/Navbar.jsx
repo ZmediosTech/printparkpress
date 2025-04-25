@@ -88,7 +88,7 @@ const Navbar = ({ handleOrderPopup }) => {
     <>
     <nav className="shadow-sm w-full">
      
-      <div className="shadow-md bg-orange-300 dark:bg-gray-900 dark:text-white duration-200  relative z-40">
+      <div className="shadow-md bg-green-500 fixed top-0  dark:text-white duration-200  w-full z-40">
         <CartSidebar
           isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
@@ -166,6 +166,7 @@ const Navbar = ({ handleOrderPopup }) => {
           <button
             onClick={() => {
               localStorage.removeItem("email");
+              localStorage.removeItem("token")
               setShowProfileMenu(false);
             }}
             className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-500 hover:text-red-700 dark:hover:text-red-400"
