@@ -29,7 +29,7 @@ const Checkout = () => {
     console.log("called");
     try {
       // ... existing order data preparation ...
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orederId: 5 }),
@@ -220,7 +220,7 @@ const Checkout = () => {
         paymentMethod: "Cash on Delivery",
       };
 
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -329,7 +329,7 @@ const Checkout = () => {
                     className="flex items-center gap-4 border-b pb-4 mb-4"
                   >
                      <img
-                      src={`http://localhost:5000${item.imageUrl}`}
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-lg"
                     />

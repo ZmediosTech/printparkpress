@@ -11,7 +11,7 @@ const ProductDetail = () => {
 
   const fetchSingleProduct = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/${id}`);
       const data = await response.json();
       if (response.ok) {
         setProduct(Array.isArray(data.data) ? data.data : [data.data]);
@@ -64,7 +64,7 @@ const ProductDetail = () => {
         <div key={item.id} className="flex flex-col md:flex-row gap-8 mb-12">
           <div className="md:w-1/2 flex justify-center">
             <img
-              src={`http://localhost:5000${item.imageUrl}`}
+              src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
               alt={item.title}
               className="rounded-lg w-[400px] h-[400px] object-cover shadow-lg"
             />

@@ -60,7 +60,7 @@ const CartPage = () => {
                 className="flex items-start gap-4 border-b pb-4"
               >
              <img
-  src={`${import.meta.env.VITE_API_URL}/${item.imageUrl}`}
+  src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
   alt={item.title}
   className="w-24 h-24 object-cover rounded"
 />

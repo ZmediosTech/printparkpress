@@ -89,7 +89,7 @@ const Products = () => {
     try {
       const productId = product._id || product.id;
       const data = await fetch(
-        `http://localhost:5000/api/wishlist/user/${email}/items`,
+        `${import.meta.env.VITE_API_BASE_URL}/wishlist/user/${email}/items`,
         {
           method: "POST",
           headers: {
@@ -119,7 +119,6 @@ const Products = () => {
           duration: 2500,
           position: "top-right",
         });
-        
       } else {
         toast.error("Item is already in wishlist", {
           style: {
@@ -148,9 +147,10 @@ const Products = () => {
     setShowModal(true);
     navigate(`/product/${data._id}`);
   };
+  console.log(import.meta.env.VITE_API_BASE_URL,"apiUrl")
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/products");
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products`);
       const data = await response.json();
       if (response.ok) {
         setProducts(data.data);
@@ -255,16 +255,29 @@ const Products = () => {
               >
                 <div className="relative overflow-hidden rounded-2xl mb-6">
                   <img
-                    src={`http://localhost:5000${data.imageUrl}`}
+                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}${data.imageUrl}`}
                     alt={data.title}
                     className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
 
-                <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-4 text-center">
-                  Rs {data.price}
-                </p>
+                <div className="text-center mb-4">
+                  <p className="text-xl font-semibold text-black">
+                    ₹{data.price.toLocaleString("en-IN")}
+                    <span className="text-gray-500 line-through text-sm ml-2">
+                      ₹{data.originalPrice?.toLocaleString("en-IN")}
+                    </span>
+                    <span className="text-green-600 text-sm ml-2">
+                      {Math.round(
+                        ((data.originalPrice - data.price) /
+                          data.originalPrice) *
+                          100
+                      )}
+                      % off
+                    </span>
+                  </p>
+                </div>
 
                 <div className="text-center">
                   <h3 className="font-bold text-gray-800 text-xl mb-3">

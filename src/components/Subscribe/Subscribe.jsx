@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import Banner from "../../assets/website/orange-pattern.jpg";
+import toast from "react-hot-toast";
 
 const BannerImg = {
   backgroundImage: `url(${Banner})`,
@@ -10,6 +11,45 @@ const BannerImg = {
 };
 
 const Subscribe = () => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!email || !email.includes("@")) {
+      setMessage("Please enter a valid email.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.success == true) {
+        toast.success("Thanks for subscribing")
+        setMessage("Thanks for subscribing!");
+        setEmail("");
+      } else {
+        setMessage(data.error || "Something went wrong.");
+      }
+    } catch (error) {
+      console.error("Subscribe error:", error);
+      setMessage("Network error. Try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div
       data-aos="zoom-in"
@@ -29,13 +69,28 @@ const Subscribe = () => {
             <input
               data-aos="fade-up"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               className="w-full p-3 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
-            <button className="px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition">
-              Subscribe
+            <button
+              onClick={handleSubscribe}
+              disabled={loading || !email}
+              className={`px-6 py-3 font-medium rounded-md transition ${
+                loading || !email
+                  ? "bg-orange-300 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 text-white"
+              }`}
+            >
+              {loading ? "Subscribing..." : "Subscribe"}
             </button>
           </div>
+          {/* {message && (
+            <p className="text-sm text-center text-white font-medium mt-2">
+              {message}
+            </p>
+          )} */}
         </div>
       </div>
     </div>

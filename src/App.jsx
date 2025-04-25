@@ -14,7 +14,6 @@ import Popup from "./components/Popup/Popup";
 import CartPage from "./components/CartPage/CartPage";
 import ProductDetail from "./components/ProductDetail/ProductDetail";
 import Login from "./components/Login/Login";
-import Signup from "./components/Signup/Signup";
 import Profile from "./components/Profile/Profile";
 import Checkout from "./components/Checkout/Checkout";
 import Wishlist from "./components/Wishlist/Wishlist";
@@ -25,6 +24,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { Toaster } from "react-hot-toast";
 import ResetPassword from "./components/ResetPassword/ResetPassword";
+import Signup from "./components/signup/signup";
 
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);

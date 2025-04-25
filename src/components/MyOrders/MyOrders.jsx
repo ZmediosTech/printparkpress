@@ -11,7 +11,7 @@ const MyOrders = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/orders/user/${email}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders/user/${email}`);
       const data = await response.json();
       console.log('Orders response:', data); 
       if (data.success) {
@@ -94,7 +94,7 @@ const MyOrders = () => {
                   <div className="flex gap-4">
                     <div className="w-24 h-24 flex-shrink-0">
                       <img
-                        src={`http://localhost:5000${item.image}`}
+                        src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.image}`}
                         alt={item.name}
                         className="w-full h-full object-cover rounded-lg"
                         onError={(e) => {

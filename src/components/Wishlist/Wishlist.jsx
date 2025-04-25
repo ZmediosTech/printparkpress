@@ -26,7 +26,7 @@ const Wishlist = () => {
     setLoading(true)
     try {
       const response = await fetch(
-        `http://localhost:5000/api/wishlist/user/${email}`
+        `${import.meta.env.VITE_API_BASE_URL}/wishlist/user/${email}`
       );
       const data = await response.json();
       if (data.success) {
@@ -46,7 +46,7 @@ const Wishlist = () => {
   const removeFromWishlist = async (productId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/wishlist/user/${email}/remove/${productId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/wishlist/user/${email}/remove/${productId}`,
         { method: "DELETE" }
       );
       const data = await response.json();
@@ -104,7 +104,7 @@ const Wishlist = () => {
             >
               <div className="relative">
                 <img
-                  src={`http://localhost:5000${item.imageUrl || item.image}`}
+                  src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl || item.image}`}
                   alt={item.name}
                   className="w-full h-48 object-cover rounded-lg"
                 />

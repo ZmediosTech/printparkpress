@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
+import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 import { Link as ScrollLink } from "react-scroll";
 import footerLogo from "../../assets/logo.jpeg";
 import Banner from "../../assets/website/footer-pattern.jpg";
@@ -30,15 +30,15 @@ const FooterLinks = [
 const Footer = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [formData, setFormData] = useState({
-    email: '',
-    phone: '',
-    message: ''
+    email: "",
+    phone: "",
+    message: "",
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
   const handleSubmit = async (e) => {
@@ -47,39 +47,47 @@ const Footer = () => {
       const contactData = {
         email: formData.email,
         phone: formData.phone,
-        message: formData.message
+        message: formData.message,
       };
-      const response = await fetch('http://localhost:5000/api/contact', {
-        method: 'POST',
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
-        body: JSON.stringify(contactData)
+        body: JSON.stringify(contactData),
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      toast.success('Message sent successfully!');
-      setIsContactOpen(false);
-      setFormData({ email: '', phone: '', message: '' });
+      if (data.success == true) {
+        toast.success("Message sent successfully!");
+        setIsContactOpen(false);
+        setFormData({ email: "", phone: "", message: "" });
+      }
     } catch (error) {
-      console.error('Error sending message:', error);
-      toast.error('Failed to send message. Please try again.');
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message. Please try again.");
     }
   };
-  
 
   return (
     <>
       <div style={BannerImg} className="text-white w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div data-aos="zoom-in" className="grid md:grid-cols-3 gap-8 pt-10 pb-32">
+          <div
+            data-aos="zoom-in"
+            className="grid md:grid-cols-3 gap-8 pt-10 pb-32"
+          >
             {/* Company Details */}
             <div>
               <h1 className="sm:text-3xl text-xl font-bold mb-3 flex items-center gap-3">
-                <img src={footerLogo} alt="Glowriti Logo" className="max-w-[50px]" />
+                <img
+                  src={footerLogo}
+                  alt="Glowriti Logo"
+                  className="max-w-[50px]"
+                />
                 Glowriti
               </h1>
               <p className="text-gray-300 text-sm">
@@ -129,9 +137,15 @@ const Footer = () => {
                 <p>+91 123456789</p>
               </div>
               <div className="flex items-center gap-4">
-                <a href="#"><FaInstagram className="text-2xl hover:text-orange-500 transition" /></a>
-                <a href="#"><FaFacebook className="text-2xl hover:text-orange-500 transition" /></a>
-                <a href="#"><FaLinkedin className="text-2xl hover:text-orange-500 transition" /></a>
+                <a href="#">
+                  <FaInstagram className="text-2xl hover:text-orange-500 transition" />
+                </a>
+                <a href="#">
+                  <FaFacebook className="text-2xl hover:text-orange-500 transition" />
+                </a>
+                <a href="#">
+                  <FaLinkedin className="text-2xl hover:text-orange-500 transition" />
+                </a>
               </div>
             </div>
           </div>
@@ -142,15 +156,17 @@ const Footer = () => {
       {isContactOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 w-full max-w-md relative">
-            <button 
+            <button
               onClick={() => setIsContactOpen(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
               <FaTimes size={20} />
             </button>
-            
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Contact Us</h2>
-            
+
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              Contact Us
+            </h2>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <input
@@ -163,7 +179,7 @@ const Footer = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <input
                   type="tel"
@@ -175,7 +191,7 @@ const Footer = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <textarea
                   name="message"
@@ -187,7 +203,7 @@ const Footer = () => {
                   required
                 ></textarea>
               </div>
-              
+
               <button
                 type="submit"
                 className="w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
