@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
 
 router.get('/user/:email', async (req, res) => {
   try {
-    const orders = await Order.find({ 'user.email': req.params.email });
+    const orders = await Order.find({ 'user.email': req.params.email }).sort({ orderDate: -1 });;
 
     if (orders.length === 0) {
       return res.status(404).json({
@@ -64,7 +64,7 @@ router.get('/user/:email', async (req, res) => {
 // Get all orders
 router.get('/', async (req, res) => {
   try {
-    const orders = await Order.find();
+    const orders = await Order.find().sort({ orderDate: -1 }); // or use 'orderDate' if that's your field
     res.status(200).json({
       success: true,
       count: orders.length,
@@ -77,6 +77,7 @@ router.get('/', async (req, res) => {
     });
   }
 });
+
 
 // Get single order by ID
 router.get('/:id', async (req, res) => {

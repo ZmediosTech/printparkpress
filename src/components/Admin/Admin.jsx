@@ -71,7 +71,7 @@ const Admin = () => {
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
-            <div className="bg-gradient-to-r from-primary to-secondary p-4 sm:p-6 rounded-lg text-white">
+            {/* <div className="bg-gradient-to-r from-primary to-secondary p-4 sm:p-6 rounded-lg text-white">
               <div className="flex items-center">
                 <FaUsers className="text-3xl sm:text-4xl" />
                 <div className="ml-4">
@@ -83,7 +83,7 @@ const Admin = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-4 sm:p-6 rounded-lg text-white">
               <div className="flex items-center">
                 <FaShoppingBag className="text-3xl sm:text-4xl" />
@@ -133,7 +133,9 @@ const Admin = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
+
                   {orders.map((order) => (
+                    
                     <tr key={order._id} className="hover:bg-gray-50">
                       <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
                         {order._id}

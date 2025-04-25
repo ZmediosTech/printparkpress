@@ -91,7 +91,7 @@ const MyOrders = () => {
               
               {order.products.map((item) => (
                 <div key={item._id} className="p-4 border-b last:border-b-0">
-                  <div className="flex gap-4">
+                  <div className="flex gap-4" onClick={() => navigate(`/product/${item.productId}`)}>
                     <div className="w-24 h-24 flex-shrink-0">
                       <img
                         src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.image}`}

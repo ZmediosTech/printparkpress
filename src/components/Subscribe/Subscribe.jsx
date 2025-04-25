@@ -61,7 +61,7 @@ const Subscribe = () => {
           <h1 className="text-2xl sm:text-4xl font-bold text-center">
             Get Notified About New Products
           </h1>
-          <p className="text-black text-sm sm:text-base text-center sm:text-left">
+          <p className="text-black text-sm sm:text-base text-center sm:text-left mx-20">
             Sign up to our newsletter to receive grooming tips, style inspiration,
             exclusive access to pre-launch product pricing and more.
           </p>
