@@ -4,7 +4,7 @@ import MyOrders from "./components/MyOrders/MyOrders";
 import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Products from "./components/Products/Products";
-import About from "./components/About/About";  // Ensure this import path is correct
+import About from "./components/About/About";
 import TopProducts from "./components/TopProducts/TopProducts";
 import Banner from "./components/Banner/Banner";
 import Subscribe from "./components/Subscribe/Subscribe";
@@ -20,22 +20,19 @@ import Checkout from "./components/Checkout/Checkout";
 import Wishlist from "./components/Wishlist/Wishlist";
 import { CartProvider } from "./components/context/CartContext";
 import { AuthProvider } from "./components/context/AuthContext";
-
 import AOS from "aos";
 import "aos/dist/aos.css";
-
-// ✅ Toastify
 import { Toaster } from "react-hot-toast";
 import ResetPassword from "./components/ResetPassword/ResetPassword";
 
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);
   const [error, setError] = useState(null);
+  const location = useLocation();
 
   const handleOrderPopup = () => {
     setOrderPopup(!orderPopup);
   };
-  const location = useLocation();
 
   useEffect(() => {
     try {
@@ -53,54 +50,57 @@ function App() {
 
   if (error) return <div>Error: {error.message}</div>;
 
-  return (
+  const excludedPaths = ["/login", "/signup", "/reset-password"];
+  const showNavbarAndFooter = !excludedPaths.includes(location.pathname);
 
-      <AuthProvider>
-        <CartProvider>
-          <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
-            {/* Conditionally render Navbar */}
-            {!["/login", "/signup", "/reset-password"].includes(location.pathname) && (
-              <Navbar handleOrderPopup={handleOrderPopup} />
-            )}
-  
-            {/* ✅ Toast Container */}
-            <Toaster position="top-right" reverseOrder={false} />
-  
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <>
-                    <Hero handleOrderPopup={handleOrderPopup} />
-                    <About />
-                    <Products handleOrderPopup={handleOrderPopup} />
-                    <Banner />
-                    <Subscribe />
-                    <Testimonials />
-                  </>
-                }
-              />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/myOrders" element={<MyOrders />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="*" element={<div className="text-center py-20 text-xl">404 - Page Not Found</div>} />
-            </Routes>
-  
-            {/* Conditionally render Footer */}
-            {!["/login", "/signup", "/reset-password"].includes(location.pathname) && <Footer />}
-            <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
-          </div>
-        </CartProvider>
-      </AuthProvider>
+  return (
+    <AuthProvider>
+      <CartProvider>
+        <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
+          {showNavbarAndFooter && <Navbar handleOrderPopup={handleOrderPopup} />}
+          
+          <Toaster position="top-right" reverseOrder={false} />
+          
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Hero handleOrderPopup={handleOrderPopup} />
+                  <About />
+                  <Products handleOrderPopup={handleOrderPopup} />
+                  <Banner />
+                  <Subscribe />
+                  <Testimonials />
+                </>
+              }
+            />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/myOrders" element={<MyOrders />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route 
+              path="*" 
+              element={
+                <div className="text-center py-20 text-xl">
+                  404 - Page Not Found
+                </div>
+              } 
+            />
+          </Routes>
+
+          {showNavbarAndFooter && <Footer />}
+          <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
+        </div>
+      </CartProvider>
+    </AuthProvider>
   );
-  
 }
 
 export default App;
