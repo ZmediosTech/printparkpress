@@ -12,7 +12,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       name: req.body.name,
       description: req.body.description,
       price: req.body.price,
-      //   category: req.body.category,
+      originalPrice:req.body.originalPrice,
       rating: req.body.rating,
       imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
     });
