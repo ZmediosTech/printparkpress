@@ -18,6 +18,7 @@ import Signup from "./components/Signup/Signup";
 import Profile from "./components/Profile/Profile";
 import Checkout from "./components/Checkout/Checkout";
 import Wishlist from "./components/Wishlist/Wishlist";
+import Admin from "./components/Admin/Admin";
 import { CartProvider } from "./components/context/CartContext";
 import { AuthProvider } from "./components/context/AuthContext";
 import AOS from "aos";
@@ -50,7 +51,7 @@ function App() {
 
   if (error) return <div>Error: {error.message}</div>;
 
-  const excludedPaths = ["/login", "/signup", "/reset-password"];
+  const excludedPaths = ["/login", "/signup", "/reset-password", "/admin"];
   const showNavbarAndFooter = !excludedPaths.includes(location.pathname);
 
   return (
@@ -75,6 +76,7 @@ function App() {
                 </>
               }
             />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/checkout" element={<Checkout />} />
