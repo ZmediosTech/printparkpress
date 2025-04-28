@@ -103,7 +103,7 @@ const Navbar = ({ handleOrderPopup }) => {
                       <div className="flex items-center">
               <Link to="/" className="font-bold  text-2xl sm:text-3xl flex items-center gap-3">
                 <img src={Logo} alt="Logo" className="w-14 h-14 object-contain" />
-                <span className="text-gray-800 dark:text-white">Glowriti</span>
+                <span className="text-gray-800 dark:text-white">Glowrity</span>
               </Link>
             </div>
  
