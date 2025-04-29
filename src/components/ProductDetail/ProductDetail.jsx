@@ -63,13 +63,13 @@ const [loading, setLoading] = useState(false);
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-[400px]">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="container mx-auto px-4 py-8">
       {product.map((item) => (
