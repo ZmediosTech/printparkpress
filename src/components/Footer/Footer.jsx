@@ -29,6 +29,8 @@ const FooterLinks = [
 
 const Footer = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+  
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -42,6 +44,8 @@ const Footer = () => {
     }));
   };
   const handleSubmit = async (e) => {
+    setLoading(true);
+
     e.preventDefault();
     try {
       const contactData = {
@@ -68,13 +72,21 @@ const Footer = () => {
         toast.success("Message sent successfully!");
         setIsContactOpen(false);
         setFormData({ email: "", phone: "", message: "" });
+      setLoading(false);
+
       }
     } catch (error) {
       console.error("Error sending message:", error);
       toast.error("Failed to send message. Please try again.");
     }
   };
-
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   return (
     <>
       <div style={BannerImg} className="text-white w-full">

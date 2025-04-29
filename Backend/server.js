@@ -34,7 +34,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/contact', contactRoutes);
-app.use("api/subscribe",subscribeRoutes)
+app.use('/api/subscribe',subscribeRoutes)
 
 
 // Error handling middleware

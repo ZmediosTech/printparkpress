@@ -25,7 +25,8 @@ const Subscribe = () => {
     setMessage("");
 
     try {
-      const res = await fetch("/subscribe", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/subscribe`, {
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,11 +37,16 @@ const Subscribe = () => {
       const data = await res.json();
 
       if (res.success == true) {
+      setLoading(false);
+
         toast.success("Thanks for subscribing")
         setMessage("Thanks for subscribing!");
         setEmail("");
       } else {
+        toast.error("Something went wrong.")
         setMessage(data.error || "Something went wrong.");
+      setLoading(false);
+
       }
     } catch (error) {
       console.error("Subscribe error:", error);
@@ -49,7 +55,13 @@ const Subscribe = () => {
       setLoading(false);
     }
   };
-
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   return (
     <div
       data-aos="zoom-in"

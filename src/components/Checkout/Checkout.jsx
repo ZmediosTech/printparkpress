@@ -9,6 +9,8 @@ const Checkout = () => {
   console.log(cartItems,"cart")
   const { userEmail } = useAuth();
   console.log(userEmail,"userEmail")
+    const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
   const email = localStorage.getItem("email")
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
@@ -220,6 +222,7 @@ const Checkout = () => {
         }, 0),
         paymentMethod: "Cash on Delivery",
       };
+      setLoading(true);
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
         method: "POST",
@@ -239,6 +242,8 @@ const Checkout = () => {
             border: "1px solid #ddd",
           },
         });
+      setLoading(false);
+
         navigate("/")
     clearCart();
 
