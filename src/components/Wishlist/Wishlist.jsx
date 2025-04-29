@@ -100,7 +100,7 @@ const Wishlist = () => {
           {wishlistItems.map((item) => (
             <div
               key={item.productId}
-              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+              className="border rounded-lg p-4 mt-8 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="relative">
                 <img
