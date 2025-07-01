@@ -108,6 +108,23 @@ const Admin = () => {
                 </div>
               </div>
             </div>
+              {/* Total Contacts Card */}
+           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 sm:p-6 rounded-lg text-white">
+           <div className="flex items-center">
+      <FaUsers className="text-3xl sm:text-4xl" />
+      <div className="ml-4">
+        <p className="text-base sm:text-lg font-semibold">
+          Total Contacts
+        </p>
+        <p className="text-2xl sm:text-3xl font-bold">
+          {contactData.length}
+        </p>
+      </div>
+    </div>
+         </div>
+         
+          </div>
+
           </div>
 
           {/* Orders Section */}
@@ -310,7 +327,7 @@ const Admin = () => {
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 

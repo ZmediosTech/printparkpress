@@ -100,10 +100,10 @@ const Footer = () => {
               <h1 className="sm:text-3xl text-xl font-bold mb-3 flex items-center gap-3">
                 <img
                   src={footerLogo}
-                  alt="Glowrity Logo"
+                  alt="Printpark Press Logo"
                   className="max-w-[50px]"
                 />
-                Glowrity
+                Printpark Press
               </h1>
               <p className="text-gray-300 text-sm">
                 Glority is a modern, responsive eCommerce web application

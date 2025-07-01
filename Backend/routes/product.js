@@ -6,13 +6,13 @@ import path from "path";
 const router = express.Router();
 // Post a new products
 router.post("/", upload.single("image"), async (req, res) => {
-  console.log(req.file, "manish");
+  console.log(req, "manish");
   try {
     const newProduct = new Product({
-      name: req.body.name,
+      title: req.body.name,
       description: req.body.description,
       price: req.body.price,
-      originalPrice:req.body.originalPrice,
+      originalPrice:req.body?.originalPrice,
       rating: req.body.rating,
       imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
     });

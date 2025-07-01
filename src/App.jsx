@@ -25,6 +25,7 @@ import "aos/dist/aos.css";
 import { Toaster } from "react-hot-toast";
 import ResetPassword from "./components/ResetPassword/ResetPassword";
 import Signup from "./components/signup/signup";
+import Product from "./components/Product/Product";
 
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);
@@ -81,6 +82,8 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/upload/product" element={<Product />} />
+
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

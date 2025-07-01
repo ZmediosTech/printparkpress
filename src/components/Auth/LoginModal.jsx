@@ -65,7 +65,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                 onClick={onSwitchToSignup}
                 className="w-full text-[#2874f0] py-4 mt-4 text-base font-medium"
               >
-                New to Glowrity? Create an account
+                New to Printpark Press? Create an account
               </button>
             </form>
           </div>
