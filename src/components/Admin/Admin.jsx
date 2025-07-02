@@ -1,334 +1,797 @@
-import React, { useState, useEffect } from "react";
-import { FaUsers, FaShoppingBag } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import {
+  Layout,
+  Menu,
+  Table,
+  Modal,
+  Form,
+  Input,
+  InputNumber,
+  Upload,
+  Button,
+  message,
+  Popconfirm,
+  Image,
+  Card,
+  Select,
+} from "antd";
+import {
+  AppstoreOutlined,
+  ShoppingOutlined,
+  UploadOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import Logo from "../../assets/hero/image.jfif";
+import { useNavigate } from "react-router-dom";
 
-const Admin = () => {
+const { Header, Sider, Content } = Layout;
+
+const HomePage = () => {
+  const [menuKey, setMenuKey] = useState("products");
+  const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [contactData, setContactData] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [orderLoading, setOrderLoading] = useState(false);
+  const [form] = Form.useForm();
+  const [addForm] = Form.useForm();
+  const [fileList, setFileList] = useState([]);
+  const [addFileList, setAddFileList] = useState([]);
+  const [imagePreview, setImagePreview] = useState("");
+  const [currentProduct, setCurrentProduct] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [editReviewModalOpen, setEditReviewModalOpen] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [editReviewForm] = Form.useForm();
+
+  const [reviewForm] = Form.useForm();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchOrders();
-    fetchContactDetails();
+    fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (menuKey === "orders") fetchOrders();
+  }, [menuKey]);
+
+  const fetchProducts = async () => {
+    const res = await fetch("http://localhost:5000/api/products");
+    const data = await res.json();
+    if (data.success) setProducts(data.data);
+  };
+
   const fetchOrders = async () => {
+    setOrderLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/orders");
-      const data = await response.json();
-      if (data.success) {
-        setOrders(data.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+      const res = await fetch("http://localhost:5000/api/orders");
+      const data = await res.json();
+      if (data.success) setOrders(data.data);
+    } catch (err) {
+      console.error("Error fetching orders", err);
+    } finally {
+      setOrderLoading(false);
     }
   };
-  const fetchContactDetails = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/contact");
-      const data = await response.json();
-      console.log(data, "user");
-      if (data.success) {
-        setContactData(data.data || []);
+
+  const handleEdit = (product) => {
+    setCurrentProduct(product);
+    form.setFieldsValue({
+      title: product.title,
+      subtitle: product.subtitle,
+      category: product.category,
+      description: product.description,
+      price: product.price,
+    });
+    setImagePreview(`http://localhost:5000${product.imageUrl}`);
+    setFileList([]);
+    setEditModalOpen(true);
+  };
+
+  const handleUpdate = async () => {
+    const values = await form.validateFields();
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("subtitle", values.subtitle);
+    formData.append("category", values.category);
+
+    formData.append("description", values.description);
+    formData.append("price", values.price);
+    if (fileList.length > 0) {
+      formData.append("image", fileList[0].originFileObj);
+    }
+
+    const res = await fetch(
+      `http://localhost:5000/api/products/${currentProduct._id}`,
+      {
+        method: "PUT",
+        body: formData,
       }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
+    );
+    const data = await res.json();
+    if (data.success) {
+      message.success("Product updated");
+      fetchProducts();
+      setEditModalOpen(false);
+    } else {
+      message.error("Update failed");
     }
   };
-  // const fetchUsers = async () => {
-  //   try {
-  //     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
-  //     const data = await response.json();
-  //     if (data.success) {
-  //       setUsers(data.data || []);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching users:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
   const checkVerification = async () => {
     const email = localStorage.getItem("email");
     if (email == "arihant@yopmail.com") {
       setLoading(false);
     } else {
-      window.location.href = "/";
+      window.location.href = "http://localhost:5173/login";
     }
   };
-  useEffect(() => {
-    checkVerification();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
+  const handleUpdateReview = async () => {
+    const values = await editReviewForm.validateFields();
+    const res = await fetch(
+      `http://localhost:5000/api/reviews/${editingReview._id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      }
     );
-  }
+    const data = await res.json();
+    if (data.success) {
+      message.success("Review updated");
+      fetchReviews();
+      setEditReviewModalOpen(false);
+    } else {
+      message.error("Failed to update review");
+    }
+  };
+  const openEditReview = (review) => {
+    setEditingReview(review);
+    editReviewForm.setFieldsValue(review);
+    setEditReviewModalOpen(true);
+  };
+
+  const handleDeleteReview = async (id) => {
+    const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (data.success) {
+      message.success("Review deleted");
+      fetchReviews();
+    } else {
+      message.error("Failed to delete review");
+    }
+  };
+
+  useEffect(() => {
+    //  checkVerification();
+  }, []);
+  const handleAddProduct = async () => {
+    const values = await addForm.validateFields();
+    const formData = new FormData();
+    formData.append("title", values.title);
+    formData.append("subtitle", values.subtitle);
+    formData.append("category", values.category);
+
+    formData.append("description", values.description);
+    formData.append("price", values.price);
+    if (addFileList.length > 0) {
+      formData.append("image", addFileList[0].originFileObj);
+    }
+
+    const res = await fetch("http://localhost:5000/api/products", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.success) {
+      message.success("Product added");
+      fetchProducts();
+      setAddModalOpen(false);
+      addForm.resetFields();
+      setAddFileList([]);
+    } else {
+      message.error("Failed to add product");
+    }
+  };
+  const fetchReviews = async () => {
+    const res = await fetch("http://localhost:5000/api/reviews");
+    const data = await res.json();
+    if (data.success) setReviews(data.data);
+  };
+
+  useEffect(() => {
+    if (menuKey === "reviews") fetchReviews();
+  }, [menuKey]);
+
+  const productColumns = [
+    {
+      title: "Image",
+      dataIndex: "imageUrl",
+      render: (url) => (
+        <Image
+          width={50}
+          height={50}
+          src={`http://localhost:5000${url}`}
+          fallback="https://via.placeholder.com/50"
+        />
+      ),
+    },
+    { title: "Title", dataIndex: "title" },
+    { title: "Subtitle", dataIndex: "subtitle" },
+    {
+      title: "Category",
+      dataIndex: "category",
+    },
+
+    { title: "Description", dataIndex: "description", ellipsis: true },
+    {
+      title: "Price",
+      dataIndex: "price",
+      render: (price) => `₹${price}`,
+    },
+    {
+      title: "Actions",
+      render: (record) => (
+        <>
+          <Button
+            icon={<EditOutlined />}
+            style={{ marginRight: 8 }}
+            onClick={() => handleEdit(record)}
+          />
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              setProductToDelete(record);
+              setDeleteModalOpen(true);
+            }}
+          />
+        </>
+      ),
+    },
+  ];
+
+  const orderColumns = [
+    {
+      title: "Full Name",
+      dataIndex: ["user", "fullName"],
+    },
+    {
+      title: "Email",
+      dataIndex: ["user", "email"],
+    },
+    {
+      title: "Mobile",
+      dataIndex: ["user", "mobile"],
+    },
+    {
+      title: "Address",
+      render: (record) => {
+        const { street, city, pincode } = record.user?.address || {};
+        return `${street || ""}, ${city || ""}, ${pincode || ""}`;
+      },
+    },
+    {
+      title: "Date",
+      dataIndex: "orderDate",
+      render: (d) =>
+        new Date(d).toLocaleDateString("en-IN", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+    },
+    {
+      title: "Products",
+      dataIndex: "products",
+      render: (products) => (
+        <ul style={{ paddingLeft: 16 }}>
+          {products?.map((p) => (
+            <li key={p._id}>
+              {p.name} x {p.quantity}
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    {
+      title: "Image",
+      dataIndex: "products",
+      render: (products) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {products?.map((p) => (
+            <div
+              key={p._id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#fafafa",
+                padding: 6,
+                borderRadius: 4,
+              }}
+            >
+              <Image
+                width={50}
+                height={50}
+                src={`http://localhost:5000${p.imageUrl || p.image}`}
+                alt={p.name}
+                style={{ objectFit: "cover", borderRadius: 4 }}
+                fallback="https://via.placeholder.com/50"
+                preview={{
+                  maskClassName: "preview-mask", // Optional styling
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      ),
+    },
+
+    {
+      title: "Total",
+      render: (record) => {
+        const total = record.products.reduce(
+          (sum, p) => sum + p.price * p.quantity,
+          0
+        );
+        return `₹${total.toLocaleString("en-IN")}`;
+      },
+    },
+  ];
+  const reviewColumns = [
+    { title: "Name", dataIndex: "name" },
+    { title: "Message", dataIndex: "message" },
+    { title: "Rating", dataIndex: "rating" },
+    { title: "Address", dataIndex: "address" },
+    {
+      title: "Actions",
+      render: (record) => (
+        <>
+          <Button
+            icon={<EditOutlined />}
+            style={{ marginRight: 8 }}
+            onClick={() => openEditReview(record)}
+          />
+          <Popconfirm
+            title="Are you sure to delete this review?"
+            onConfirm={() => handleDeleteReview(record._id)}
+            okText="Yes"
+            cancelText="No"
+            okButtonProps={{
+              style: {
+                backgroundColor: "#1677ff",
+                borderColor: "#1677ff",
+                color: "#fff",
+              },
+              type: "primary",
+            }}
+          >
+            <Button danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </>
+      ),
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-8">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-8 text-gray-800 flex items-center">
-          Admin Dashboard
-          <span className="ml-2 px-3 py-1 bg-primary text-white text-sm rounded-full">
-            Admin
-          </span>
-        </h1>
-
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100">
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 sm:p-6 rounded-lg text-white">
-              <div className="flex items-center">
-                <FaUsers className="text-3xl sm:text-4xl" />
-                <div className="ml-4">
-                  <p className="text-base sm:text-lg font-semibold">
-                    Total Contacts
-                  </p>
-                  <p className="text-2xl sm:text-3xl font-bold">
-                    {contactData.length}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-4 sm:p-6 rounded-lg text-white">
-              <div className="flex items-center">
-                <FaShoppingBag className="text-3xl sm:text-4xl" />
-                <div className="ml-4">
-                  <p className="text-base sm:text-lg font-semibold">
-                    Total Orders
-                  </p>
-                  <p className="text-2xl sm:text-3xl font-bold">
-                    {orders.length}
-                  </p>
-                </div>
-              </div>
-            </div>
-              {/* Total Contacts Card */}
-           <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-4 sm:p-6 rounded-lg text-white">
-           <div className="flex items-center">
-      <FaUsers className="text-3xl sm:text-4xl" />
-      <div className="ml-4">
-        <p className="text-base sm:text-lg font-semibold">
-          Total Contacts
-        </p>
-        <p className="text-2xl sm:text-3xl font-bold">
-          {contactData.length}
-        </p>
-      </div>
-    </div>
-         </div>
-         
-          </div>
-
-          </div>
-
-          {/* Orders Section */}
-          <div className="mb-8">
-            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-800 flex items-center">
-              <FaShoppingBag className="mr-2" />
-              Orders
-            </h2>
-            <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    {/* <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[15%]">ORDER ID</th> */}
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
-                      FULLNAME
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[15%]">
-                      EMAIL
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
-                      MOBILE
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[15%]">
-                      ADDRESS
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
-                      DATE
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[30%]">
-                      PRODUCTS
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600 w-[10%]">
-                      TOTAL
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {orders.map((order) => (
-                    <tr key={order._id} className="hover:bg-gray-50">
-                      {/* <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">{order._id}</td> */}
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
-                        {order.user?.fullName || "N/A"}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
-                        {order.user?.email}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
-                        {order.user?.mobile || "N/A"}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
-                        {order.user?.address?.street} ,
-                        {order.user?.address.city} ,
-                        {order.user?.address.pincode}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm whitespace-nowrap">
-                        {new Date(order.orderDate).toLocaleDateString("en-IN", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm">
-                        <div className="space-y-1.5">
-                          {order.products?.map((product) => (
-                            <div
-                              key={product._id}
-                              className="flex items-center gap-2"
-                            >
-                              <div className="w-12 object-cover flex gap-2 h-12 flex-shrink-0 overflow-hidden rounded border border-gray-200">
-                                <img
-                                  src={`http://localhost:5000${
-                                    product.imageUrl || product.image
-                                  }`}
-                                  alt={product.name}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src =
-                                      "https://via.placeholder.com/48";
-                                  }}
-                                />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="font-medium text-gray-800 truncate text-xs">
-                                  {product.name}
-                                </p>
-                                <p className="text-gray-500 text-xs">
-                                  Qty: {product.quantity}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm truncate">
-                        <select
-                          value={order.status || "Pending"} // Assuming status field in the order response
-                          onChange={async (e) => {
-                            const newStatus = e.target.value;
-                            setOrders((prevOrders) =>
-                              prevOrders.map((ord) =>
-                                ord._id === order._id
-                                  ? { ...ord, status: newStatus }
-                                  : ord
-                              )
-                            );
-                            // try {
-                            //   // Send update to the API (replace with actual endpoint)
-                            //   const response = await fetch(
-                            //     `http://localhost:5000/api/orders/${order._id}`,
-                            //     {
-                            //       method: "PUT",
-                            //       headers: {
-                            //         "Content-Type": "application/json",
-                            //       },
-                            //       body: JSON.stringify({ status: newStatus }),
-                            //     }
-                            //   );
-                            //   const data = await response.json();
-                            //   if (data.success) {
-                            //     setOrders((prevOrders) =>
-                            //       prevOrders.map((ord) =>
-                            //         ord._id === order._id
-                            //           ? { ...ord, status: newStatus }
-                            //           : ord
-                            //       )
-                            //     );
-                            //   } else {
-                            //     console.error("Error updating status");
-                            //   }
-                            // } catch (error) {
-                            //   console.error(
-                            //     "Error updating order status:",
-                            //     error
-                            //   );
-                            // }
-                          }}
-                          className="bg-gray-50 border border-gray-200 rounded p-2 text-sm"
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Completed">Completed</option>
-                        </select>
-                      </td>
-
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap">
-                        ₹
-                        {order.products
-                          ?.reduce(
-                            (total, item) =>
-                              total + parseFloat(item.price) * item.quantity,
-                            0
-                          )
-                          .toLocaleString("en-IN")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Users Section */}
-          <div>
-            <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-800 flex items-center">
-              <FaUsers className="mr-2" />
-              CONTACT US
-            </h2>
-            <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600">
-                      EMAIL
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600">
-                      PHONE
-                    </th>
-                    <th className="text-left py-3 px-4 sm:px-6 text-xs sm:text-sm font-semibold text-gray-600">
-                      MESSAGE
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {contactData.map((user) => (
-                    <tr key={user._id} className="hover:bg-gray-50">
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm">
-                        {user.email}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm">
-                        {user.phone}
-                      </td>
-                      <td className="py-3 px-4 sm:px-6 text-xs sm:text-sm">
-                        {user.message}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+    <Layout style={{ minHeight: "100vh" }}>
+      <Sider breakpoint="lg" className="">
+        <div style={{ color: "white", textAlign: "center", padding: 16 }}>
+          Admin
         </div>
-      </div>
-    
+        <img  onClick={() => navigate("/")}src={Logo} alt="Logo" className="w-14 h-14 px-2 mx-4 object-contain" />
+        <Menu
+          theme="dark"
+          mode="inline"
+          selectedKeys={[menuKey]}
+          onClick={({ key }) => setMenuKey(key)}
+          items={[
+            {
+              key: "products",
+              icon: <AppstoreOutlined />,
+              label: "Products",
+            },
+            {
+              key: "orders",
+              icon: <ShoppingOutlined />,
+              label: "Orders",
+            },
+            // {
+            //   key: "reviews",
+            //   icon: <AppstoreOutlined />,
+            //   label: "Reviews",
+            // },
+          ]}
+        />
+      </Sider>
+
+      <Layout>
+        <Header style={{ background: "#fff" }}>
+          <h2 className="text-center font-semibold text-2xl mt-4">
+            Admin Panel
+          </h2>
+        </Header>
+        <Content style={{ margin: 24 }}>
+          {menuKey === "products" && (
+            <Card
+              title="Product List"
+              extra={
+                <Button
+                  className="bg-blue-600 text-white"
+                  type="primary"
+                  onClick={() => setAddModalOpen(true)}
+                >
+                  Add Product
+                </Button>
+              }
+            >
+              <Table
+                dataSource={products}
+                columns={productColumns}
+                rowKey="_id"
+                bordered
+                pagination={{ pageSize: 5 }}
+              />
+            </Card>
+          )}
+
+          {menuKey === "orders" && (
+            <Card title="Order List">
+              <Table
+                loading={orderLoading}
+                dataSource={orders}
+                columns={orderColumns}
+                rowKey="_id"
+                bordered
+                pagination={{ pageSize: 5 }}
+              />
+            </Card>
+          )}
+          {menuKey === "reviews" && (
+            <Card
+              title="Review List"
+              extra={
+                <Button
+                  type="primary"
+                  onClick={() => setReviewModalOpen(true)}
+                  className="bg-blue-600 text-white"
+                >
+                  Add Review
+                </Button>
+              }
+            >
+              <Table
+                dataSource={reviews}
+                columns={reviewColumns}
+                rowKey="_id"
+                bordered
+                pagination={{ pageSize: 5 }}
+              />
+            </Card>
+          )}
+        </Content>
+      </Layout>
+
+      {/* Edit Product Modal */}
+      <Modal
+        title={
+          <div
+            style={{
+              textAlign: "center",
+              width: "100%",
+              font: "bold",
+              fontSize: "22px",
+            }}
+          >
+            Edit Product
+          </div>
+        }
+        open={editModalOpen}
+        onCancel={() => setEditModalOpen(false)}
+        onOk={handleUpdate}
+        okText="Update"
+        okButtonProps={{
+          type: "primary", // Ensures it's blue
+          style: {
+            backgroundColor: "#1677ff", // Primary blue
+            borderColor: "#1677ff",
+          },
+        }}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="subtitle"
+            label="SubTitle"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item
+            name="category"
+            label="Category"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select placeholder="Select a category">
+              <Select.Option value="Premium Quality">
+                Premium Quality
+              </Select.Option>
+              <Select.Option value="Best Seller">Best Seller</Select.Option>
+              <Select.Option value="Eco-friendly">Eco-friendly</Select.Option>
+              <Select.Option value="New Arrival">New Arrival</Select.Option>
+              <Select.Option value="New Design">New Design</Select.Option>
+              <Select.Option value="New">New</Select.Option>
+              <Select.Option value="Limited Offer">Limited Offer</Select.Option>
+              <Select.Option value="Customizable">Customizable</Select.Option>
+              <Select.Option value="New Release">New Release</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="price" label="Price" rules={[{ required: true }]}>
+            <InputNumber style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item label="Image">
+            <Upload
+              beforeUpload={() => false}
+              fileList={fileList}
+              onChange={({ fileList }) => setFileList(fileList)}
+              listType="picture"
+              maxCount={1}
+            >
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
+            {imagePreview && (
+              <Image src={imagePreview} width={100} style={{ marginTop: 8 }} />
+            )}
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Add Product Modal */}
+      <Modal
+        title={
+          <div
+            style={{
+              textAlign: "center",
+              width: "100%",
+              font: "bold",
+              fontSize: "22px",
+            }}
+          >
+            Add Product
+          </div>
+        }
+        open={addModalOpen}
+        onCancel={() => setAddModalOpen(false)}
+        onOk={handleAddProduct}
+        okText="Add"
+        okButtonProps={{
+          type: "primary", // Ensures it's blue
+          style: {
+            backgroundColor: "#1677ff", // Primary blue
+            borderColor: "#1677ff",
+          },
+        }}
+      >
+        <Form form={addForm} layout="vertical">
+          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="subtitle"
+            label="SubTitle"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item
+            name="category"
+            label="Category"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select placeholder="Select a category">
+              <Select.Option value="Premium Quality">
+                Premium Quality
+              </Select.Option>
+              <Select.Option value="Best Seller">Best Seller</Select.Option>
+              <Select.Option value="Eco-friendly">Eco-friendly</Select.Option>
+              <Select.Option value="New Arrival">New Arrival</Select.Option>
+              <Select.Option value="New Design">New Design</Select.Option>
+              <Select.Option value="New">New</Select.Option>
+              <Select.Option value="Limited Offer">Limited Offer</Select.Option>
+              <Select.Option value="Customizable">Customizable</Select.Option>
+              <Select.Option value="New Release">New Release</Select.Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="price" label="Price" rules={[{ required: true }]}>
+            <InputNumber style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item label="Image" required>
+            <Upload
+              beforeUpload={() => false}
+              fileList={addFileList}
+              onChange={({ fileList }) => setAddFileList(fileList)}
+              listType="picture"
+              maxCount={1}
+            >
+              <Button icon={<UploadOutlined />}>Upload</Button>
+            </Upload>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title={
+          <div
+            style={{
+              textAlign: "center",
+              width: "100%",
+              font: "bold",
+              fontSize: "25px",
+            }}
+          >
+            Confirm Deletion
+          </div>
+        }
+        open={deleteModalOpen}
+        onCancel={() => setDeleteModalOpen(false)}
+        onOk={async () => {
+          if (!productToDelete) return;
+
+          const res = await fetch(
+            `http://localhost:5000/api/products/${productToDelete._id}`,
+            {
+              method: "DELETE",
+            }
+          );
+          const data = await res.json();
+          if (data.success) {
+            message.success("Product deleted");
+            fetchProducts();
+          } else {
+            message.error("Delete failed");
+          }
+          setDeleteModalOpen(false);
+          setProductToDelete(null);
+        }}
+        okText="Yes, Delete"
+        cancelText="Cancel"
+        okButtonProps={{ danger: true }}
+        centered
+      >
+        <p
+          style={{
+            fontSize: 14,
+            fontWeight: 400,
+            textAlign: "center",
+            marginTop: "10px",
+          }}
+        >
+          Are you sure you want to delete the product:
+        </p>
+        <p
+        // style={{
+        //   textAlign: "center",
+        //   fontWeight: 600,
+        //   fontSize: 16,
+        //   marginTop: 8,
+        //   color: "#d9363e",
+        // }}
+        >
+          {/* {productToDelete?.title} */}
+        </p>
+      </Modal>
+      {/* add review */}
+      <Modal
+        title="Add Review"
+        open={reviewModalOpen}
+        onCancel={() => setReviewModalOpen(false)}
+        onOk={async () => {
+          const values = await reviewForm.validateFields();
+          const res = await fetch("http://localhost:5000/api/reviews", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+          });
+          const data = await res.json();
+          if (data.success) {
+            message.success("Review added");
+            fetchReviews();
+            setReviewModalOpen(false);
+            reviewForm.resetFields();
+          } else {
+            message.error("Failed to add review");
+          }
+        }}
+        okText="Submit"
+        okButtonProps={{
+          type: "primary",
+          style: { backgroundColor: "#1677ff", borderColor: "#1677ff" },
+        }}
+      >
+        <Form form={reviewForm} layout="vertical">
+          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="message"
+            label="Message"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
+            <InputNumber min={1} max={5} />
+          </Form.Item>
+          <Form.Item
+            name="address"
+            label="Address"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+      {/* update review */}
+      <Modal
+        title="Edit Review"
+        open={editReviewModalOpen}
+        onCancel={() => setEditReviewModalOpen(false)}
+        onOk={handleUpdateReview}
+        okText="Update"
+        okButtonProps={{
+          type: "primary",
+          style: { backgroundColor: "#1677ff", borderColor: "#1677ff" },
+        }}
+      >
+        <Form form={editReviewForm} layout="vertical">
+          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="message"
+            label="Message"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={3} />
+          </Form.Item>
+          <Form.Item name="rating" label="Rating" rules={[{ required: true }]}>
+            <InputNumber min={1} max={5} />
+          </Form.Item>
+          <Form.Item
+            name="address"
+            label="Address"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </Layout>
   );
 };
 
-export default Admin;
+export default HomePage;

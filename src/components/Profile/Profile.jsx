@@ -109,7 +109,7 @@ const Profile = () => {
               <h2 className="text-2xl font-bold text-gray-900">My Addresses</h2>
               <button
                 onClick={() => setShowAddressForm(true)}
-                className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-orange-600"
               >
                 Add New Address
               </button>

@@ -13,7 +13,7 @@ import {
 } from "react-icons/fa";
 
 const BannerImg = {
-  backgroundImage: `url(${Banner})`,
+  // backgroundImage: `url(${Banner})`,
   backgroundPosition: "bottom",
   backgroundRepeat: "no-repeat",
   backgroundSize: "cover",
@@ -89,11 +89,11 @@ const Footer = () => {
   // }
   return (
     <>
-      <div style={BannerImg} className="text-white w-full">
+      <div style={BannerImg} className="text-white w-full bg-[#B0BEC5]  ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
             data-aos="zoom-in"
-            className="grid md:grid-cols-3 gap-8 pt-10 pb-32"
+            className="grid md:grid-cols-3 gap-8 pt-10 py-8"
           >
             {/* Company Details */}
             <div>

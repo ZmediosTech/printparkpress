@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
 const CartContext = createContext();
  
@@ -7,7 +8,7 @@ export const CartProvider = ({ children }) => {
     const savedCart = localStorage.getItem('cartItems');
     return savedCart ? JSON.parse(savedCart) : [];
   });
-
+console.log(cartItems,"cartItems")
   const [savedItems, setSavedItems] = useState(() => {
     const savedForLater = localStorage.getItem('savedItems');
     return savedForLater ? JSON.parse(savedForLater) : [];
@@ -30,12 +31,16 @@ export const CartProvider = ({ children }) => {
     const existingProduct = cartItems.find(item => item._id === product._id);
     if (existingProduct) {
       setCartItems(cartItems.map(item => 
-        item._id === product._id 
-          ? {...item, quantity: (item.quantity || 1) + 1}
+        item._id == product._id 
+          ? {...item, quantity: (item.quantity || 1) + product.quantity-1}
           : item
       ));
+        toast.success("Product already in cart!");
+    
     } else {
       setCartItems([...cartItems, {...product, quantity: 1}]);
+        toast.success("Product added in cart!");
+   
     }
   };
   
@@ -51,7 +56,7 @@ export const CartProvider = ({ children }) => {
     
     setCartItems(prevItems => 
       prevItems.map(item => 
-        item._id === product._id
+        item._id == product._id
           ? { ...item, quantity: newQuantity }
           : item
       )

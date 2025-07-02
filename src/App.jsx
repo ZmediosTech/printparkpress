@@ -58,7 +58,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <div className="bg-white dark:bg-gray-900 dark:text-white duration-200">
+        <div className="bg-gray-100  dark:bg-gray-900 dark:text-white duration-200">
           {showNavbarAndFooter && <Navbar handleOrderPopup={handleOrderPopup} />}
           
           <Toaster position="top-right" reverseOrder={false} />
@@ -69,10 +69,10 @@ function App() {
               element={
                 <>
                   <Hero handleOrderPopup={handleOrderPopup} />
-                  <About />
+                  {/* <About /> */}
                   <Products handleOrderPopup={handleOrderPopup} />
-                  <Banner />
-                  <Subscribe />
+                  {/* <Banner /> */}
+                  {/* <Subscribe /> */}
                   <Testimonials />
                 </>
               }
@@ -82,7 +82,7 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />
-            {/* <Route path="/upload/product" element={<Product />} /> */}
+            <Route path="/admin" element={<Product />} />
 
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/login" element={<Login />} />

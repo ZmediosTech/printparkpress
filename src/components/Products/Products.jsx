@@ -1,69 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
-import { FaShoppingCart, FaHeart, FaCheckCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Img1 from "../../assets/women/BhringrajP.jpg";
-import Img2 from "../../assets/women/RosemaryP.jpg";
-import Img3 from "../../assets/women/TeaTreeP.jpg";
-import Img4 from "../../assets/women/RosemaryWaterP.jpg";
+import { Pagination, Modal, Rate, Tooltip } from "antd";
 import { toast } from "react-hot-toast";
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
-
-export const ProductsData = [
-  {
-    id: 1,
-    img: Img1,
-    title: "Bhringraj Hair Oil",
-    price: "900",
-    rating: 4,
-    aosDelay: "0",
-    description:
-      "Bhringraj oil promotes hair growth, prevents dandruff and strengthens the roots. Regular use improves scalp health and reduces hair loss naturally. This Ayurvedic agent nourishes deeply, reinforcing shine and volume.",
-  },
-  {
-    id: 2,
-    img: Img2,
-    title: "Rosemary Hair Oil",
-    price: "800",
-    aosDelay: "200",
-    description:
-      "Rosemary oil stimulates circulation and promotes hair growth. Its antioxidant and antimicrobial properties reduce dandruff and strengthen hair strands for long-lasting shine.",
-  },
-  {
-    id: 3,
-    img: Img3,
-    title: "Tea Tree Shampoo",
-    price: "700",
-    aosDelay: "400",
-    description:
-      "Tea tree shampoo helps control dandruff, soothes the scalp, and removes buildup. Its antifungal properties balance scalp health and refresh oily hair.",
-  },
-  {
-    id: 4,
-    img: Img4,
-    title: "Rosemary Water",
-    price: "600",
-    aosDelay: "600",
-    description:
-      "Rosemary water supports hair growth, reduces dandruff, and strengthens hair roots. It improves scalp circulation and restores smoothness and shine.",
-  },
-];
+import { FaShoppingCart, FaHeart, FaCheckCircle } from "react-icons/fa";
 
 const Products = () => {
   const navigate = useNavigate();
   const [wishlistItems, setWishlistItems] = useState(new Set());
   const [showPopup, setShowPopup] = useState(false);
   const [addedItem, setAddedItem] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [showModal, setShowModal] = useState(false);
   const [products, setProducts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   let email = localStorage.getItem("email");
-  const { addToCart, cartItems } = useCart();
-  const handleAddToCart = (e, product) => {
-    e.stopPropagation();
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (product) => {
     const productToAdd = {
       ...product,
-      id: product._id || product.id, // Handle both API and local products
+      id: product._id || product.id,
       quantity: 1,
     };
     addToCart(productToAdd);
@@ -72,17 +29,9 @@ const Products = () => {
     setTimeout(() => setShowPopup(false), 5000);
   };
 
-  const handleWishlist = async (e, product) => {
-    e.stopPropagation();
+  const handleWishlist = async (product) => {
     if (!email) {
-      toast.error("Please login to add items to wishlist", {
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-        position: "top-right",
-      });
+      toast.error("Please login to add items to wishlist");
       return;
     }
 
@@ -92,70 +41,35 @@ const Products = () => {
         `${import.meta.env.VITE_API_BASE_URL}/wishlist/user/${email}/items`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(product),
         }
       );
 
       if (data.ok) {
-        setWishlistItems((prev) => {
-          const newSet = new Set(prev);
-          newSet.add(productId);
-          return newSet;
-        });
-                toast.success("Item added to wishlist");
-        
-        // toast.success("Item added to wishlist!", {
-        //   icon: "✅",
-        //   style: {
-        //     borderRadius: "12px",
-        //     background: "linear-gradient(135deg, #38b2ac, #319795)",
-        //     color: "#ffffff",
-        //     padding: "14px 20px",
-        //     fontWeight: "500",
-        //     fontSize: "16px",
-        //     boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
-        //   },
-        //   duration: 2500,
-        //   position: "top-right",
-        // });
+        setWishlistItems((prev) => new Set(prev).add(productId));
+        toast.success("Item added to wishlist");
       } else {
-        toast.error("Item is already in wishlist", {
-          style: {
-            borderRadius: "10px",
-            // background: "#333",
-            color: "black",
-          },
-          position: "top-right",
-        });
+        toast.error("Item is already in wishlist");
       }
     } catch (error) {
-      toast.error("Error adding to wishlist", {
-        style: {
-          borderRadius: "10px",
-          background: "#333",
-          color: "#fff",
-        },
-        position: "top-right",
-      });
+      toast.error("Error adding to wishlist");
     }
   };
 
-  const handleProductClick = (e, data) => {
-    e.stopPropagation();
-    setSelectedProduct(data);
-    setShowModal(true);
-    navigate(`/product/${data._id}`);
+  const handleProductClick = (product) => {
+    navigate(`/product/${product._id}`);
   };
-  console.log(import.meta.env.VITE_API_BASE_URL,"apiUrl")
+
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/products?page=${page}&limit=8`
+      );
       const data = await response.json();
       if (response.ok) {
         setProducts(data.data);
+        setTotalPages(data.totalPages || 1);
       } else {
         console.error("Error fetching products:", data.message);
       }
@@ -166,158 +80,89 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
-  const renderStars = (rating) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      if (rating >= i) {
-        stars.push(<FaStar key={i} className="text-yellow-400" />);
-      } else if (rating >= i - 0.5) {
-        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
-      } else {
-        stars.push(<FaRegStar key={i} className="text-yellow-400" />);
-      }
-    }
-    return stars;
-  };
+  }, [page]);
 
   return (
-    <div className="mt-14 mb-12 relative px-4 sm:px-6 lg:px-10 bg-gradient-to-b from-orange-50 to-white">
-      {/* Success Popup */}
+    <div className="mt-20 px-4 sm:px-8 md:px-16">
+      <h1 className="text-center text-4xl font-bold mb-10 text-gray-800">
+       Our Products
+      </h1>
+
       {showPopup && addedItem && (
-        <div className="fixed top-4 right-4 bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-fade-in-down flex items-center gap-3 transform hover:scale-105 transition-all duration-300">
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3">
           <FaCheckCircle className="text-2xl" />
-          <span className="font-medium">{addedItem.title} added to cart!</span>
+          <span>{addedItem.title} added to cart!</span>
         </div>
       )}
 
-      {/* Product Modal */}
-      {showModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-3xl w-full relative transform transition-all duration-300 hover:scale-[1.02]">
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute -top-4 -right-4 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-            >
-              ×
-            </button>
-            <div className="flex flex-col md:flex-row gap-8">
-              <img
-                src={selectedProduct.img}
-                alt={selectedProduct.title}
-                className="w-full md:w-1/2 h-[400px] object-cover rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300"
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 p-4 mx-10">
+        {products.map((product) => (
+          <div
+            key={product._id}
+            onClick={() => handleProductClick(product)}
+            className="bg-white rounded-xl shadow hover:shadow-lg transition duration-300 relative group cursor-pointer overflow-hidden border"
+          >
+            <img
+              alt={product.title}
+              src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`}
+              className="h-68 w-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {product.title}
+              </h3>
+              <Rate
+                disabled
+                allowHalf
+                defaultValue={product.rating || 0}
+                className="text-yellow-400 mb-2"
               />
-              <div className="flex flex-col justify-center">
-                <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                  {selectedProduct.title}
-                </h3>
-                <p className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent mb-6">
-                  {selectedProduct.price}
-                </p>
-                <p className="text-gray-600 leading-relaxed text-lg">
-                  {selectedProduct.description}
-                </p>
-              </div>
+              <p className=" text-lg font-semibold">
+                AED {product.price}
+              </p>
             </div>
-          </div>
-        </div>
-      )}
 
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-16 max-w-2xl mx-auto">
-          <p
-            data-aos="fade-up"
-            className="text-lg font-medium text-orange-500 mb-4"
-          >
-            Top Selling Products for you
-          </p>
-          <h1
-            data-aos="fade-up"
-            className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-orange-900 bg-clip-text text-transparent mb-6"
-          >
-            Products
-          </h1>
-          <p data-aos="fade-up" className="text-gray-600 text-lg">
-            Choose from our bestsellers loved by customers and powered by
-            nature.
-          </p>
-        </div>
-
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 place-items-center">
-          {products.map((data) => (
-            <div
-              key={data.id}
-              className="bg-white cursor-pointer rounded-3xl p-6 w-full max-w-xs shadow-xl transition-all duration-500 hover:scale-105 hover:shadow-2xl relative group backdrop-blur-sm border border-orange-100"
-            >
-              <div
-                onClick={(e) => handleProductClick(e, data)}
-                className="group relative overflow-hidden rounded-2xl mb-6"
-              >
-                <div className="relative overflow-hidden rounded-2xl mb-6">
-                  <img
-                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}${data.imageUrl}`}
-                    alt={data.title}
-                    className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-
-                <div className="text-center mb-4">
-                  <p className="text-xl font-semibold text-black">
-                    ₹{data.price.toLocaleString("en-IN")}
-                    <span className="text-gray-500 line-through text-sm ml-2">
-                      ₹{data.originalPrice?.toLocaleString("en-IN")}
-                    </span>
-                    <span className="text-green-600 text-sm ml-2">
-                      {Math.round(
-                        ((data.originalPrice - data.price) /
-                          data.originalPrice) *
-                          100
-                      )}
-                      % off
-                    </span>
-                  </p>
-                </div>
-
-                <div className="text-center">
-                  <h3 className="font-bold text-gray-800 text-xl mb-3">
-                    {data.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-6 line-clamp-2">
-                    {data.description}
-                  </p>
-                  <div className="flex items-center justify-center mb-2 gap-1">
-                    {renderStars(data.rating)}
-                    {/* <span className="text-gray-500 text-sm">
-                      ({data.rating})
-                    </span> */}
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-center gap-4">
+            {/* Icons */}
+            <div className="absolute top-3 right-3 flex flex-col gap-2">
+              <Tooltip title="Add to Cart">
                 <button
-                  onClick={(e) => handleAddToCart(e, data)}
-                  className="bg-gradient-to-r from-orange-400 to-orange-600 text-white py-2.5 px-6 rounded-full hover:from-orange-500 hover:to-orange-700 flex items-center gap-2 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-orange-300/50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddToCart(product);
+                  }}
+                  className="bg-white p-2 rounded-full shadow hover:bg-blue-100"
                 >
-                  <FaShoppingCart className="text-lg" />
-                  <span>Add to Cart</span>
+                  <FaShoppingCart className="text-blue-600" />
                 </button>
+              </Tooltip>
+              {/* <Tooltip title="Add to Wishlist">
                 <button
-                  onClick={(e) => handleWishlist(e, data)}
-                  className={`p-3 rounded-full transition-all duration-300 shadow-lg ${
-                    wishlistItems.has(data._id || data.id)
-                      ? "bg-red-500 text-white shadow-red-300/50"
-                      : "bg-gray-100 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-red-300/50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleWishlist(product);
+                  }}
+                  className={`bg-white p-2 rounded-full shadow ${
+                    wishlistItems.has(product._id)
+                      ? "text-red-500 hover:bg-red-100"
+                      : "text-gray-500 hover:text-red-500 hover:bg-red-100"
                   }`}
                 >
-                  <FaHeart className="text-lg" />
+                  <FaHeart />
                 </button>
-              </div>
+              </Tooltip> */}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mt-10 items-center justify-center flex">
+        <Pagination
+          current={page}
+          pageSize={8}
+          total={totalPages * 8}
+          onChange={(value) => setPage(value)}
+          showSizeChanger={false}
+        />
       </div>
     </div>
   );

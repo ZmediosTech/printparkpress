@@ -39,18 +39,18 @@ const About = () => {
 
   return (
     <Element name="about">
-      <div className="relative overflow-hidden min-h-[550px] py-20 px-4 sm:px-6 lg:px-10 bg-gradient-to-br from-orange-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 dark:text-white transition-colors duration-300">
+      <div className="relative overflow-hidden min-h-[550px] py-20 px-4 sm:px-6 lg:px-10  dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 dark:text-white transition-colors duration-300">
         {/* Decorative Gradient Background Elements */}
         <div className="absolute inset-0 overflow-hidden z-0">
-          <div className="absolute -top-1/2 -right-1/3 w-[600px] h-[600px] bg-orange-100 dark:bg-orange-900/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-orange-200/40 dark:bg-orange-800/20 rounded-full blur-3xl"></div>
+          <div className="absolute -top-1/2 -right-1/3 w-[600px] h-[600px]  dark:bg-orange-900/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px]  dark:bg-orange-800/20 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Header */}
           <div className="text-center mb-16 max-w-3xl mx-auto">
             <p className="text-lg font-medium text-orange-500 mb-4">Learn More About Us</p>
-            <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-orange-600 to-orange-900 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-5xl font-extrabold  bg-clip-text text-transparent mb-6">
               About Us
             </h1>
             <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">

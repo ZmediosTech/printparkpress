@@ -1,586 +1,339 @@
 import React, { useState, useEffect } from "react";
+import {
+  Card,
+  Button,
+  Input,
+  Form,
+  Modal,
+  Radio,
+  Row,
+  Col,
+  Typography,
+  List,
+  notification,
+  Spin,
+} from "antd";
 import { useCart } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+
+const { Title, Text } = Typography;
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
-  console.log(cartItems,"cart")
-  const { userEmail } = useAuth();
-  console.log(userEmail,"userEmail")
-    const [loading, setLoading] = useState(false);
-  
   const navigate = useNavigate();
-  const email = localStorage.getItem("email")
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [isEditingIndex, setIsEditingIndex] = useState(null);
-  const [showOrderSummary, setShowOrderSummary] = useState(false);
-  // Add new state for payment step
-  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
-  // Replace handlePlaceOrder with these two functions
-  const handleContinueToPayment = () => {
-    // if (!userEmail) {
-    //   toast.error("Please enter your email");
-    //   return;
-    // }
-    setShowPaymentOptions(true);
-  };
-  const handleConfirmOrder = async () => {
-    console.log("called");
-    try {
-      // ... existing order data preparation ...
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orederId: 5 }),
-      });
+  const email = localStorage.getItem("email");
+  const [loading, setLoading] = useState(false);
+  const [addresses, setAddresses] = useState(
+    JSON.parse(localStorage.getItem("addresses")) || []
+  );
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [form] = Form.useForm();
+  const [showPayment, setShowPayment] = useState(false);
 
-      if (response.ok) {
-        toast.success("Order placed successfully!");
-        clearCart();
-        navigate("/");
-      }
-    } catch (error) {
-      toast.error("Failed to place order");
-    }
-  };
-  const [profileData, setProfileData] = useState({
-    fullName: "",
-    mobile: "",
-    email: "",
-    addresses: JSON.parse(localStorage.getItem("addresses")),
-  });
-
-  const [newAddress, setNewAddress] = useState({
-    name: "",
-    mobile: "",
-    pincode: "",
-    state: "",
-    address: "",
-    locality: "",
-    cityDistrict: "",
-    addressType: "Home",
-    weekends: {
-      saturday: false,
-      sunday: false,
-    },
-    isDefault: false,
-  });
-
-  const handleDeliverHere = (index) => {
-    setSelectedAddressIndex(index);
-    setShowOrderSummary(true);
-    toast.success("Address selected for delivery", {
-      style: {
-        background: "#fff",
-        color: "#015c3b",
-        border: "1px solid #86efac",
-      },
-    });
+  const handleAddAddress = () => {
+    setEditingIndex(null);
+    form.resetFields();
+    setShowAddressModal(true);
   };
 
-  const handleEditClick = (index) => {
-    setIsEditingIndex(index);
-    setNewAddress(profileData.addresses[index]);
-    setShowAddressForm(true);
+  const handleEditAddress = (index) => {
+    setEditingIndex(index);
+    form.setFieldsValue(addresses[index]);
+    setShowAddressModal(true);
   };
 
   const handleDeleteAddress = (index) => {
-    const updatedAddresses = [...profileData.addresses];
-    updatedAddresses.splice(index, 1);
-
-    setProfileData((prev) => ({
-      ...prev,
-      addresses: updatedAddresses,
-    }));
-
-    if (selectedAddressIndex === index) {
-      setSelectedAddressIndex(null);
-    } else if (selectedAddressIndex > index) {
-      setSelectedAddressIndex((prev) => prev - 1);
-    }
-
-    toast.success("Address deleted");
+    const updated = [...addresses];
+    updated.splice(index, 1);
+    setAddresses(updated);
+    if (selectedIndex === index) setSelectedIndex(null);
+    localStorage.setItem("addresses", JSON.stringify(updated));
+    notification.success({ message: "Address removed" });
   };
 
-  const handleAddNewAddress = () => {
-    setIsEditingIndex(null);
-    setNewAddress({
-      name: "",
-      mobile: "",
-      pincode: "",
-      state: "",
-      address: "",
-      locality: "",
-      cityDistrict: "",
-      addressType: "Home",
-      // weekends: {
-      //   saturday: false,
-      //   sunday: false,
-      // },
-      isDefault: false,
-    });
-    setShowAddressForm(true);
-  };
-
-  const handleAddressChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      if (name === "saturday" || name === "sunday") {
-        setNewAddress((prev) => ({
-          ...prev,
-          weekends: {
-            ...prev.weekends,
-            [name]: checked,
-          },
-        }));
+  const handleSaveAddress = () => {
+    form.validateFields().then((values) => {
+      const updated = [...addresses];
+      if (editingIndex !== null) {
+        updated[editingIndex] = values;
       } else {
-        setNewAddress((prev) => ({
-          ...prev,
-          [name]: checked,
-        }));
+        updated.push(values);
       }
-    } else {
-      setNewAddress((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+      setAddresses(updated);
+      localStorage.setItem("addresses", JSON.stringify(updated));
+      setShowAddressModal(false);
+      notification.success({ message: "Address saved" });
+    });
   };
 
-  const handleAddressSubmit = (e) => {
-    e.preventDefault();
-    const updatedAddresses = [...(profileData?.addresses || [])];
-
-
-    if (isEditingIndex !== null) {
-      updatedAddresses[isEditingIndex] = newAddress;
-    } else {
-      updatedAddresses.push(newAddress);
+  const handleContinue = () => {
+    if (selectedIndex === null) {
+      notification.warning({ message: "Select a delivery address" });
+      return;
     }
-
-    setProfileData((prev) => ({
-      ...prev,
-      addresses: updatedAddresses,
-    }));
-
-    setShowAddressForm(false);
-    setNewAddress({
-      name: "",
-      mobile: "",
-      pincode: "",
-      state: "",
-      address: "",
-      locality: "",
-      cityDistrict: "",
-      addressType: "Home",
-      weekends: {
-        saturday: false,
-        sunday: false,
-      },
-      isDefault: false,
-    });
+    if (!email) {
+      notification.error({ message: "Please login to place an order" });
+      return;
+    }
+    setShowPayment(true);
   };
 
   const handlePlaceOrder = async () => {
-    if (selectedAddressIndex === null) {
-      toast.error("Please select a delivery address");
-      return;
-    }
-    if(email == undefined || email == null){
-      toast.error("Please login to place an order");
-      setShowPaymentOptions(false);
-      return;
-    }
+    const address = addresses[selectedIndex];
+    const order = {
+      user: {
+        email,
+        fullName: address.name,
+        mobile: address.mobile,
+        address: {
+          street: address.locality,
+          city: address.cityDistrict,
+          pincode: address.pincode,
+        },
+      },
+      products: cartItems.map((item) => ({
+        productId: item._id || item.id,
+        name: item.name || item.title,
+        price: parseInt(item.price),
+        image: item.imageUrl,
+        quantity: item.quantity || 1,
+      })),
+      totalAmount: cartItems.reduce(
+        (sum, item) => sum + parseInt(item.price) * (item.quantity || 1),
+        0
+      ),
+      paymentMethod: "Cash on Delivery",
+    };
 
     try {
-      const selected = profileData.addresses[selectedAddressIndex];
-      console.log(selected,"selected")
-      const orderData = {
-        user: {
-          email: email ,
-          fullName: selected.name,
-          mobile: selected.mobile,
-          address: {
-            street: selected.locality,
-            city: selected.cityDistrict,
-            pincode: selected.pincode,
-          },
-        },
-        products: cartItems.map((item) => ({
-          productId: item._id || item.id,
-          name: item.name || item.title,
-          price: parseInt(item.price),
-          image: item.imageUrl,
-          quantity: item.quantity || 1,
-        })),
-        totalAmount: cartItems.reduce((sum, item) => {
-          const price = parseInt(item.price);
-          return sum + price * (item.quantity || 1);
-        }, 0),
-        paymentMethod: "Cash on Delivery",
-      };
       setLoading(true);
-
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
       });
 
-      const data = await response.json();
-      if(data.success == true){
-        console.log("Order placed successfully:", data);
-        toast.success("Order placed successfully!", {
-          style: {
-            background: "#fff",
-            color: "#000",
-            border: "1px solid #ddd",
-          },
-        });
+      const data = await res.json();
+      if (data.success) {
+        setLoading(false);
+
+        notification.success({ message: "Order placed!" });
+        clearCart();
+        navigate("/");
+      } else {
+        setLoading(false);
+
+        notification.error({ message: "Order failed" });
+      }
+    } catch (err) {
       setLoading(false);
 
-        navigate("/")
-    clearCart();
-
-      }
-   
-    } catch (error) {
-      console.error("Error placing order:", error);
+      console.error(err);
+      notification.error({ message: "Something went wrong" });
     }
-
   };
 
-  useEffect(() => {
-    localStorage.setItem("addresses", JSON.stringify(profileData.addresses));
-  }, [profileData.addresses]);
-
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <h2 className="text-2xl font-bold mb-6">Checkout</h2>
-
-      <div className="w-full mb-8">
-        <div className="lg:col-span-2">
-          <h3 className="text-xl font-semibold mb-4">
-            Select Delivery Address
-          </h3>
-          <button
-            onClick={handleAddNewAddress}
-            className="px-4 py-2 text-orange-500 border border-orange-500 rounded-lg hover:bg-orange-50"
-          >
-            + Add New Address
-          </button>
-          {profileData?.addresses?.map((address, index) => (
-            <div
-              key={index}
-              className={`border rounded-lg p-4 mt-8 mb-4 ${
-                selectedAddressIndex === index
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }`}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold">{address.name}</p>
-                  <p className="text-gray-600 mt-1">{address.address}</p>
-                  <p className="text-gray-600">
-                    {address.cityDistrict}, {address.state} {address.pincode}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleDeliverHere(index)}
-                    className={`px-4 py-2 rounded-lg ${
-                      selectedAddressIndex === index
-                        ? "bg-orange-500 text-white"
-                        : "border border-orange-500 text-orange-500 hover:bg-orange-50"
-                    }`}
-                  >
-                    Deliver Here
-                  </button>
-                  <button
-                    onClick={() => handleEditClick(index)}
-                    className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteAddress(index)}
-                    className="px-4 py-2 border rounded-lg text-red-500 hover:bg-red-50"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+    <Spin spinning={loading} tip="Placing your order...">
+      <div className="container mx-auto max-w-6xl px-4 py-6 mt-24">
+        <Title level={2}>Checkout</Title>
+        <Row gutter={24}>
+          {/* Address Section */}
+          <Col xs={24} md={14}>
+            <div className="mb-4 flex justify-between items-center">
+              <Title level={4}>Delivery Addresses</Title>
+              <Button
+                type="primary"
+                className="bg-blue-500"
+                onClick={handleAddAddress}
+              >
+                Add Address
+              </Button>
             </div>
-          ))}
-        </div>
-
-        <div className="lg:col-span-1">
-          {showOrderSummary && (
-            <div className="w-full bg-white border rounded-lg shadow-sm">
-              <div className="bg-orange-500 text-white p-4 rounded-t-lg">
-                <h3 className="text-lg font-semibold flex items-center">
-                  ORDER SUMMARY
-                </h3>
-              </div>
-              <div className="p-4">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-4 border-b pb-4 mb-4"
+            <List
+              itemLayout="vertical"
+              dataSource={addresses}
+              renderItem={(addr, index) => (
+                <Card
+                  key={index}
+                  className={`mb-3 border ${
+                    selectedIndex === index
+                      ? "border-orange-500 shadow-md"
+                      : "border-gray-200"
+                  }`}
+                >
+                  <Radio
+                    checked={selectedIndex === index}
+                    onChange={() => setSelectedIndex(index)}
                   >
-                     <img
-                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-grow">
-                      <div>
-                        <h4 className="font-medium text-lg text-gray-800 mb-1">{item.name}</h4>
-                        <p className="text-gray-600 text-sm">
+                    <Title level={5}>{addr.name}</Title>
+                    <Text>
+                      {addr.address}, {addr.cityDistrict}, {addr.state}
+                    </Text>
+                    <br />
+                    <Text type="secondary">Mobile: {addr.mobile}</Text>
+                  </Radio>
+                  <div className="mt-2 flex gap-2">
+                    <Button
+                      size="small"
+                      onClick={() => handleEditAddress(index)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      danger
+                      onClick={() => handleDeleteAddress(index)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Card>
+              )}
+            />
+          </Col>
+
+          {/* Order Summary */}
+          <Col xs={24} md={10}>
+            <Card title="Order Summary">
+              <List
+                dataSource={cartItems}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={
+                        <img
+                          src={`${import.meta.env.VITE_IMAGE_BASE_URL}${
+                            item.imageUrl
+                          }`}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      }
+                      title={
+                        <span className="font-semibold">{item.title}</span>
+                      }
+                      description={
+                        <span className="text-gray-600">
                           Quantity: {item.quantity}
-                        </p>
-                        {/* <p className="text-green-600 text-sm">
-                          Delivery by{" "}
-                          {new Date().toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                          })}{" "}
-                          | Free
-                        </p> */}
-                      </div>
-                      <p className="font-semibold text-orange-500 mt-2">
-                        ₹{parseFloat(item.price) * item.quantity}
-                      </p>
+                        </span>
+                      }
+                    />
+                    <div className="font-medium text-right">
+                      ₹{item.quantity * parseInt(item.price)}
                     </div>
-                  </div>
-                ))}
-
-                {/* <div className="flex justify-between items-center border-t pt-4">
-                  <div className="flex-grow">
-                    <p className="font-semibold">Total Amount</p>
-                    <div className="mt-4">
-                      <p className="text-sm text-gray-600">
-                        Order confirmation email will be sent to
-                      </p>
-                      <input
-                        type="email"
-                        value={userEmail}
-                        className="w-full max-w-xs border-b border-blue-500 focus:outline-none py-1"
-                        placeholder="Enter your email ID"
-                      />
-                    </div>
-                  </div>
-                </div> */}
-                <div className="text-right">
-                  <p className="font-semibold mb-4">
-                    ₹
-                    {cartItems.reduce(
-                      (total, item) =>
-                        total + parseFloat(item.price) * item.quantity,
-                      0
-                    )}
-                  </p>
-                  <button
-                    onClick={handleContinueToPayment}
-                    className="bg-orange-500 text-white px-8 py-3 rounded font-semibold hover:bg-orange-600 transition-colors"
-                  >
-                    CONTINUE
-                  </button>
-                </div>
+                  </List.Item>
+                )}
+              />
+              <div className="mt-4 text-right">
+                <Title level={5}>
+                  Total: ₹
+                  {cartItems.reduce(
+                    (sum, item) =>
+                      sum + parseInt(item.price) * (item.quantity || 1),
+                    0
+                  )}
+                </Title>
+                <Button
+                  type="primary"
+                  block
+                  className="mt-2 bg-blue-500"
+                  onClick={handleContinue}
+                >
+                  Continue to Payment
+                </Button>
               </div>
-            </div>
-          )}
-        </div>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Address Modal */}
+        <Modal
+          title={editingIndex !== null ? "Edit Address" : "Add Address"}
+          open={showAddressModal}
+          onOk={handleSaveAddress}
+          onCancel={() => setShowAddressModal(false)}
+          okText="Save"
+          okButtonProps={{
+            style: {
+              backgroundColor: "#1677ff",
+              borderColor: "#1677ff",
+              color: "#fff",
+            },
+            type: "primary",
+          }}
+        >
+          <Form layout="vertical" form={form}>
+            <Form.Item
+              name="name"
+              label="Full Name"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="mobile"
+              label="Mobile Number"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="pincode"
+              label="Pincode"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item name="state" label="State" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="address"
+              label="Address"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="locality"
+              label="Locality"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="cityDistrict"
+              label="City / District"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        {/* Payment Modal */}
+        <Modal
+          title="Payment Method"
+          open={showPayment}
+          onCancel={() => setShowPayment(false)}
+          onOk={handlePlaceOrder}
+          okText="Confirm Order"
+          okButtonProps={{
+            style: {
+              backgroundColor: "#1677ff",
+              borderColor: "#1677ff",
+              color: "#fff",
+            },
+            type: "primary",
+          }}
+        >
+          <Radio checked>Cash on Delivery</Radio>
+        </Modal>
       </div>
-
-      {showAddressForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4">
-            <h3 className="text-xl font-semibold mb-4">Add New Address</h3>
-            <form onSubmit={handleAddressSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Name *"
-                  value={newAddress.name}
-                  onChange={handleAddressChange}
-                  className="border p-2 rounded-md"
-                  required
-                />
-                <input
-                  type="tel"
-                  name="mobile"
-                  placeholder="Mobile *"
-                  value={newAddress.mobile}
-                  onChange={handleAddressChange}
-                  className="border p-2 rounded-md"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="pincode"
-                  placeholder="Pincode *"
-                  value={newAddress.pincode}
-                  onChange={handleAddressChange}
-                  className="border p-2 rounded-md"
-                  required
-                />
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="State *"
-                  value={newAddress.state}
-                  onChange={handleAddressChange}
-                  className="border p-2 rounded-md"
-                  required
-                />
-              </div>
-              <input
-                type="text"
-                name="address"
-                placeholder="Address *"
-                value={newAddress.address}
-                onChange={handleAddressChange}
-                className="border p-2 rounded-md w-full"
-                required
-              />
-              <input
-                type="text"
-                name="locality"
-                placeholder="Locality/Town *"
-                value={newAddress.locality}
-                onChange={handleAddressChange}
-                className="border p-2 rounded-md w-full"
-                required
-              />
-              <input
-                type="text"
-                name="cityDistrict"
-                placeholder="City/District *"
-                value={newAddress.cityDistrict}
-                onChange={handleAddressChange}
-                className="border p-2 rounded-md w-full"
-                required
-              />
-              {/* <div className="space-y-3">
-                <p className="font-medium">Type of Address *</p>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="addressType"
-                      value="Home"
-                      checked={newAddress.addressType === "Home"}
-                      onChange={handleAddressChange}
-                    />
-                    Home
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="addressType"
-                      value="Office"
-                      checked={newAddress.addressType === "Office"}
-                      onChange={handleAddressChange}
-                    />
-                    Office
-                  </label>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p>Is your office open on weekends?</p>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="saturday"
-                      checked={newAddress.weekends.saturday}
-                      onChange={handleAddressChange}
-                    />
-                    Open on Saturday
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="sunday"
-                      checked={newAddress.weekends.sunday}
-                      onChange={handleAddressChange}
-                    />
-                    Open on Sunday
-                  </label>
-                </div>
-              </div>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="isDefault"
-                  checked={newAddress.isDefault}
-                  onChange={handleAddressChange}
-                />
-                Make this as my default address
-              </label> */}
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddressForm(false)}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-      {showPaymentOptions && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-xl font-semibold mb-4">Payment Method</h3>
-            <div className="border rounded-lg p-4 mb-4">
-              <label className="flex items-center space-x-3">
-                <input
-                  type="radio"
-                  checked={true}
-                  readOnly
-                  className="form-radio text-orange-500"
-                />
-                <span className="font-medium">Cash on Delivery</span>
-              </label>
-            </div>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowPaymentOptions(false)}
-                className="px-4 py-2 border rounded-md hover:bg-gray-100"
-              >
-                Back
-              </button>
-              <button
-                onClick={handlePlaceOrder}
-                className="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
-              >
-                Confirm Order
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </Spin>
   );
 };
 

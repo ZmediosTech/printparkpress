@@ -9,10 +9,12 @@ router.post("/", upload.single("image"), async (req, res) => {
   console.log(req, "manish");
   try {
     const newProduct = new Product({
-      title: req.body.name,
+      title: req.body.title,
+      subtitle: req.body.subtitle,
+      category: req.body.category,
       description: req.body.description,
       price: req.body.price,
-      originalPrice:req.body?.originalPrice,
+      originalPrice: req.body?.originalPrice,
       rating: req.body.rating,
       imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
     });
@@ -32,10 +34,19 @@ router.post("/", upload.single("image"), async (req, res) => {
 // Get all products
 router.get("/", async (req, res) => {
   try {
-    const products = await Product.find();
+    const page = parseInt(req.query.page) || 1; // default to page 1
+    const limit = parseInt(req.query.limit) || 10; // default to 10 items per page
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      Product.find().skip(skip).limit(limit),
+      Product.countDocuments()
+    ]);
 
     res.status(200).json({
       success: true,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
       count: products.length,
       data: products,
     });
@@ -46,6 +57,7 @@ router.get("/", async (req, res) => {
     });
   }
 });
+
 // get single product by id
 
 // GET a single product by ID
@@ -99,40 +111,33 @@ router.delete("/:id", async (req, res) => {
 // PUT (update) a product by ID
 router.put("/:id", upload.single("image"), async (req, res) => {
   try {
-    const updatedData = {
-      name: req.body.name,
+    // 1. Build update object from request body
+    const updateData = {
+      title: req.body.title,
+      subtitle: req.body.subtitle,
+      category: req.body.category,
       description: req.body.description,
-      price: req.body.price,
       rating: req.body.rating,
+      price: req.body.price,
+      originalPrice: req.body.originalPrice,
     };
 
-    // If a new image is uploaded, update the imageUrl
+    // 2. Only update imageUrl if a new image was uploaded
     if (req.file) {
-      updatedData.imageUrl = `/uploads/${req.file.filename}`;
+      updateData.imageUrl = "/" + req.file.path.replace(/\\/g, "/");
     }
 
+    // 3. Perform the update
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      updatedData,
+      updateData,
       { new: true }
     );
 
-    if (!updatedProduct) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: updatedProduct,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: error.message,
-    });
+    res.json({ success: true, updated: updatedProduct });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

@@ -12,6 +12,7 @@ import productRoutes from "./routes/product.js";
 import wishlistRoutes from "./routes/wishlist.js";
 import contactRoutes from "./routes/contact.js";
 import subscribeRoutes from "./routes/subscribe.js";
+import reviewRoutes from "./routes/review.js"
 import path from "path";
 // Load env vars
 dotenv.config();
@@ -35,6 +36,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/subscribe", subscribeRoutes);
+app.use("/api/reviews", reviewRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
