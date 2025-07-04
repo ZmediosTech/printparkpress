@@ -35,7 +35,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // default to page 1
-    const limit = parseInt(req.query.limit) || 10; // default to 10 items per page
+    const limit = parseInt(req.query.limit) || 16; // default to 10 items per page
     const skip = (page - 1) * limit;
 
     const [products, total] = await Promise.all([

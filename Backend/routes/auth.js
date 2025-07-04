@@ -7,8 +7,8 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 const router = express.Router();
 dotenv.config();
 //vkdm jcsf yktu kkyc
@@ -22,56 +22,73 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 // Signup Route
-router.post('/signup', async (req, res) => {
+router.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ name, email, password: hashedPassword });
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-    res.status(201).json({success:true, message: 'User created successfully' });
+    res
+      .status(201)
+      .json({ success: true, message: "User created successfully" });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
 // Login Route
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
+      expiresIn: "1h",
     });
 
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email }, success:true});
+    res.json({
+      token,
+      user: { id: user._id, name: user.name, email: user.email },
+      success: true,
+    });
   } catch (err) {
-    console.log(err,"error")
-    res.status(500).json({ message: 'Server error' });
+    console.log(err, "error");
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// forgot password route 
-router.post('/forgot-password', async (req, res) => {
+// forgot password route
+router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ success: false, message: 'No user with that email found' });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "No user with that email found" });
 
-    const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+    const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
@@ -83,32 +100,37 @@ router.post('/forgot-password', async (req, res) => {
     const mailOptions = {
       from: process.env.EMAIL_FROM,
       to: user.email,
-      subject: 'Password Reset Request',
+      subject: "Password Reset Request",
       html: `
-        <p>Hello ${user.name || 'there'},</p>
+        <p>Hello ${user.name || "there"},</p>
         <p>You requested a password reset. Click the link below to reset your password:</p>
         <a href="${resetLink}" target="_blank">${resetLink}</a>
         <p>If you didn't request this, you can ignore this email.</p>
         <p>Thanks,<br/></p>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true, message: 'Reset link sent to email' });
-
+    res
+      .status(200)
+      .json({ success: true, message: "Reset link sent to email" });
   } catch (err) {
     console.error("Email sending error:", err);
-    res.status(500).json({ success: false, message: 'Failed to send email' });
+    res.status(500).json({ success: false, message: "Failed to send email" });
   }
 });
 
 // POST /api/auth/reset-password
-router.post('/reset-password', async (req, res) => {
+router.post("/reset-password", async (req, res) => {
   const { token, password } = req.body;
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
-    if (!user || user.resetPasswordToken !== token || user.resetPasswordExpires < Date.now()) {
+    if (
+      !user ||
+      user.resetPasswordToken !== token ||
+      user.resetPasswordExpires < Date.now()
+    ) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
@@ -122,8 +144,5 @@ router.post('/reset-password', async (req, res) => {
     res.status(400).json({ message: "Invalid token" });
   }
 });
-
-
-
 
 export default router;

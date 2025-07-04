@@ -1,76 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaUser, FaShoppingBag, FaHeart, FaSignOutAlt } from "react-icons/fa";
-
-import { toast } from "react-hot-toast";
-import Cart from "../Cart/Cart.jsx";
-import Logo from "../../assets/hero/logo.png";
-import { IoMdSearch } from "react-icons/io";
+import { FaUser, FaShoppingBag, FaSignOutAlt } from "react-icons/fa";
 import { FaCartShopping } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa";
-import DarkMode from "../Products/DarkMode.jsx";
-import CartSidebar from "../CartSidebar/CartSidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-// import { ProductsData } from '../Products/Products';
-// import SearchBar from "../SearchBar/SearchBar.jsx";
+import { toast } from "react-hot-toast";
 
-import { Link } from "react-router-dom";
+import CartSidebar from "../CartSidebar/CartSidebar";
 import SignupModal from "../Auth/SignupModal";
 import LoginModal from "../Auth/LoginModal";
+import Logo from "../../assets/hero/logo.png";
+
 const Menu = [
-  {
-    id: 1,
-    name: "Home",
-    link: "/#",
-  },
-  {
-    id: 2,
-    name: "About Us",
-    link: "/#services",
-  },
-  {
-    id: 3,
-    name: "Product",
-    link: "/#",
-  },
-  {
-    id: 4,
-    name: "Contact",
-    link: "/#",
-  },
-  {
-    id: 5,
-    name: "Blog",
-    link: "/#",
-  },
+  { id: 1, name: "Home", link: "/" },
+  { id: 3, name: "Product", link: "/product" },
+  { id: 4, name: "Contact", link: "/contact" },
 ];
 
-const Navbar = ({ handleOrderPopup }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+const Navbar = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const { cartItems } = useCart();
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  let email = localStorage.getItem("email");
-  // const handleSearch = (e) => {
-  //   e.preventDefault();
-  //   if (searchQuery.trim()) {
-  //     const searchTerm = searchQuery.toLowerCase();
-  //     const product = ProductsData.find(p =>
-  //       p.title.toLowerCase().includes(searchTerm)
-  //     );
+  const { cartItems } = useCart();
+  const navigate = useNavigate();
 
-  //     if (product) {
-  //       navigate(`/product/${product.id}`);
-  //     }
-  //   }
-  // };
+  const email = localStorage.getItem("email");
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -82,59 +39,66 @@ const Navbar = ({ handleOrderPopup }) => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("email");
+    localStorage.removeItem("token");
+    setShowProfileMenu(false);
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
 
   return (
     <>
-      <nav className="shadow-sm w-full bg-[#B0BEC5] ">
-        <div className="shadow-md  bg-[#B0BEC5]   fixed top-0  dark:text-white duration-200  w-full z-40">
+      <nav className="w-full bg-[#B0BEC5] shadow-sm z-50">
+        <div className="bg-[#44A0A0] fixed top-0 left-0 right-0 z-50 shadow-md dark:text-white transition-all duration-200">
           <CartSidebar
             isOpen={isCartOpen}
             onClose={() => setIsCartOpen(false)}
             cartItems={cartItems}
           />
 
-          {/* upper Navbar */}
-          <div className="py-1">
-            <div className="max-w-screen-xl mx-auto px-4 w-full flex justify-between items-center">
+          <div className="py-2">
+            <div className="max-w-screen-xl mx-auto px-4 flex justify-between items-center">
               {/* Logo */}
-              <div className="flex items-center">
-                <Link
-                  to="/"
-                  className="font-bold  text-2xl sm:text-3xl flex items-center gap-3"
-                >
-                  <img
-                    src={Logo}
-                    alt="Logo"
-                    className="w-44 h-24 object-cover"
-                  />
-                  {/* <span className="text-gray-800 dark:text-white">Printpark Press</span> */}
-                </Link>
-              </div>
+              <Link to="/" className="flex items-center gap-3">
+                <img
+                  src={Logo}
+                  alt="Logo"
+                  className="w-full h-20 object-cover"
+                />
+              </Link>
 
-              {/* Right Side Items */}
+              {/* Menu Navigation */}
+              <ul className="hidden sm:flex items-center gap-8 text-white text-md font-medium">
+                {Menu.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={item.link}
+                      className="relative inline-block transition-all duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-[2px] after:bg-white hover:after:w-full after:transition-all after:duration-300"
+                    >
+                      {item.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Right: Profile + Cart */}
               <div className="flex items-center space-x-6">
-                {/* Search Bar */}
-                {/* <div className="w-[300px] mx-4">
-                <SearchBar products={ProductsData} />
-              </div> */}
-
-                {/*profile*/}
-                {/* Profile Dropdown */}
+                {/* Profile */}
                 <div className="relative" ref={profileMenuRef}>
                   <button
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
-                    className="p-2 hover:text-orange-500 transition-colors flex items-center gap-1"
+                    className="p-2  dark:text-white hover:text-orange-500 transition-colors flex items-center gap-1"
                   >
-                    <FaUser className="text-xl text-gray-700 dark:text-white" />
-                    <FaCaretDown className="text-sm text-gray-700 dark:text-white" />
+                    <FaUser className="text-xl text-white" />
+                    <FaCaretDown className="text-sm text-white" />
                   </button>
 
                   {showProfileMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                       {!email ? (
                         <div className="px-4 py-3 text-sm border-b border-gray-100 dark:border-gray-600">
                           <span>New customer? </span>
@@ -142,6 +106,8 @@ const Navbar = ({ handleOrderPopup }) => {
                             onClick={() => {
                               setShowProfileMenu(false);
                               navigate("/login");
+
+                              // setIsLoginOpen(true);
                             }}
                             className="text-blue-500 hover:text-blue-700 font-medium"
                           >
@@ -164,19 +130,8 @@ const Navbar = ({ handleOrderPopup }) => {
                           >
                             <FaShoppingBag /> My Orders
                           </Link>
-                          {/* <Link
-                            to="/wishlist"
-                            onClick={() => setShowProfileMenu(false)}
-                            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          >
-                            <FaHeart /> My Wishlist
-                          </Link> */}
                           <button
-                            onClick={() => {
-                              localStorage.removeItem("email");
-                              localStorage.removeItem("token");
-                              setShowProfileMenu(false);
-                            }}
+                            onClick={handleLogout}
                             className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-500 hover:text-red-700 dark:hover:text-red-400"
                           >
                             <FaSignOutAlt /> Logout
@@ -187,11 +142,11 @@ const Navbar = ({ handleOrderPopup }) => {
                   )}
                 </div>
 
-                {/* Cart Button */}
-                <div className="relative ml-4">
+                {/* Cart */}
+                <div className="relative">
                   <button
                     onClick={() => navigate("/cart")}
-                    className="bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-full flex items-center gap-2 hover:scale-105 transition-transform"
+                    className="bg-[] text-white py-2 px-4 rounded-full flex items-center gap-2 hover:scale-105 transition-transform relative"
                   >
                     <FaCartShopping className="text-lg" />
                     {cartItems.length > 0 && (
@@ -204,26 +159,10 @@ const Navbar = ({ handleOrderPopup }) => {
               </div>
             </div>
           </div>
-
-          {/* lower Navbar */}
-          {/* <div data-aos="zoom-in" className="flex justify-center py-3">
-          <ul className="sm:flex hidden items-center gap-6">
-            {Menu.map((data) => (
-              <li key={data.id}>
-                <a href={data.link} className="">
-                  {data.name}
-                </a>
-              </li>
-            ))}
-            <li className="group relative cursor-pointer">
-              <a href="#" className="flex items-center gap-[2px] py-2">
-                Testimonial
-              </a>
-            </li>
-          </ul>
-        </div> */}
         </div>
       </nav>
+
+      {/* Modals */}
       <SignupModal
         isOpen={isSignupOpen}
         onClose={() => setIsSignupOpen(false)}

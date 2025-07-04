@@ -42,7 +42,7 @@ const HomePage = () => {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
-  const [reviews, setReviews] = useState([]);
+  const [contact, setContact] = useState([]);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [editReviewModalOpen, setEditReviewModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
@@ -199,14 +199,14 @@ const HomePage = () => {
       message.error("Failed to add product");
     }
   };
-  const fetchReviews = async () => {
-    const res = await fetch("http://localhost:5000/api/reviews");
+  const fetchContact = async () => {
+    const res = await fetch("http://localhost:5000/api/contact");
     const data = await res.json();
-    if (data.success) setReviews(data.data);
+    if (data.success) setContact(data.data);
   };
 
   useEffect(() => {
-    if (menuKey === "reviews") fetchReviews();
+    if (menuKey === "contact") fetchContact();
   }, [menuKey]);
 
   const productColumns = [
@@ -345,39 +345,11 @@ const HomePage = () => {
       },
     },
   ];
-  const reviewColumns = [
+  const contactColumns = [
     { title: "Name", dataIndex: "name" },
     { title: "Message", dataIndex: "message" },
-    { title: "Rating", dataIndex: "rating" },
-    { title: "Address", dataIndex: "address" },
-    {
-      title: "Actions",
-      render: (record) => (
-        <>
-          <Button
-            icon={<EditOutlined />}
-            style={{ marginRight: 8 }}
-            onClick={() => openEditReview(record)}
-          />
-          <Popconfirm
-            title="Are you sure to delete this review?"
-            onConfirm={() => handleDeleteReview(record._id)}
-            okText="Yes"
-            cancelText="No"
-            okButtonProps={{
-              style: {
-                backgroundColor: "#1677ff",
-                borderColor: "#1677ff",
-                color: "#fff",
-              },
-              type: "primary",
-            }}
-          >
-            <Button danger icon={<DeleteOutlined />} />
-          </Popconfirm>
-        </>
-      ),
-    },
+    { title: "Email", dataIndex: "email" },
+  
   ];
 
   return (
@@ -403,11 +375,11 @@ const HomePage = () => {
               icon: <ShoppingOutlined />,
               label: "Orders",
             },
-            // {
-            //   key: "reviews",
-            //   icon: <AppstoreOutlined />,
-            //   label: "Reviews",
-            // },
+            {
+              key: "contact",
+              icon: <AppstoreOutlined />,
+              label: "Contacts",
+            },
           ]}
         />
       </Sider>
@@ -454,22 +426,14 @@ const HomePage = () => {
               />
             </Card>
           )}
-          {menuKey === "reviews" && (
+          {menuKey === "contact" && (
             <Card
-              title="Review List"
-              extra={
-                <Button
-                  type="primary"
-                  onClick={() => setReviewModalOpen(true)}
-                  className="bg-blue-600 text-white"
-                >
-                  Add Review
-                </Button>
-              }
+              title="Contact List"
+              
             >
               <Table
-                dataSource={reviews}
-                columns={reviewColumns}
+                dataSource={contact}
+                columns={contactColumns}
                 rowKey="_id"
                 bordered
                 pagination={{ pageSize: 5 }}

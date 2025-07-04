@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Slider from "react-slick";
 import { Card, Avatar, Typography, Rate } from "antd";
 import { FaQuoteRight } from "react-icons/fa";
 import Img1 from "../../assets/shirt/image1.avif";
 import Img2 from "../../assets/shirt/image2.avif";
 import Img3 from "../../assets/shirt/image3.avif";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -39,6 +41,10 @@ const TestimonialData = [
 ];
 
 const Testimonials = () => {
+  useEffect(() => {
+    AOS.init({ duration: 800 });
+  }, []);
+
   const settings = {
     dots: true,
     arrows: false,
@@ -67,20 +73,20 @@ const Testimonials = () => {
         breakpoint: 640,
         settings: {
           slidesToShow: 1,
-        },  
+        },
       },
     ],
   };
 
   return (
-    <div className="py-30 my-8">
-      <div className="max-w-7xl mx-auto px-6">
+    <div className="py-20 my-8  dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-up">
         {/* Header */}
-        <div className="text-center mb-16">
-          <Title level={2} className="!text-3xl md:!text-5xl font-semibold dark:!text-white">
+        <div className="text-center mb-16" data-aos="zoom-in">
+          <Title level={2} className="!text-3xl md:!text-5xl font-bold dark:!text-white">
             Customer Reviews
           </Title>
-          <Text className="text-gray-500 dark:text-gray-400">
+          <Text className="text-lg">
             See what our satisfied customers are saying about us!
           </Text>
         </div>
@@ -90,8 +96,9 @@ const Testimonials = () => {
           {TestimonialData.map((data) => (
             <div key={data.id} className="px-4">
               <Card
-                className="rounded-2xl shadow-lg transition-all duration-300 hover:scale-105 dark:bg-gray-800 dark:border-none"
+                className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.03] dark:bg-gray-800 dark:border-none"
                 bordered={false}
+                data-aos="fade-up"
               >
                 <div className="flex flex-col items-center gap-4">
                   <div className="relative">
@@ -115,9 +122,7 @@ const Testimonials = () => {
                     <Title level={4} className="!mb-1 dark:!text-white">
                       {data.name}
                     </Title>
-                    <Text type="secondary" className="text-orange-500 text-sm">
-                      {data.address}
-                    </Text>
+                    <Text className="text-orange-500 text-sm">{data.address}</Text>
                   </div>
                 </div>
               </Card>

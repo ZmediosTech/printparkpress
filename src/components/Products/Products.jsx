@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { Pagination, Modal, Rate, Tooltip } from "antd";
+import { Pagination, Modal, Rate, Tooltip, Card, Badge } from "antd";
 import { toast } from "react-hot-toast";
 import { FaShoppingCart, FaHeart, FaCheckCircle } from "react-icons/fa";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import CategoryHero from "../CategoryHero.JSX";
+// import BgImage from "../assets/hero/doorstep.webp";
+import BgImage from "../../assets/hero/doorstep.webp";
+
+
+const { Meta } = Card;
 
 const Products = () => {
   const navigate = useNavigate();
@@ -14,8 +22,12 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  let email = localStorage.getItem("email");
   const { addToCart } = useCart();
+  let email = localStorage.getItem("email");
+
+  useEffect(() => {
+    AOS.init({ duration: 800 });
+  }, []);
 
   const handleAddToCart = (product) => {
     const productToAdd = {
@@ -26,7 +38,7 @@ const Products = () => {
     addToCart(productToAdd);
     setAddedItem(productToAdd);
     setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 5000);
+    setTimeout(() => setShowPopup(false), 4000);
   };
 
   const handleWishlist = async (product) => {
@@ -64,7 +76,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/products?page=${page}&limit=8`
+        `${import.meta.env.VITE_API_BASE_URL}/products?page=${page}&limit=12`
       );
       const data = await response.json();
       if (response.ok) {
@@ -83,88 +95,110 @@ const Products = () => {
   }, [page]);
 
   return (
-    <div className="mt-20 px-4 sm:px-8 md:px-16">
-      <h1 className="text-center text-4xl font-bold mb-10 text-gray-800">
-       Our Products
-      </h1>
+    <>
+      <div className="px-4 sm:px-8 md:px-16 my-6">
+        <h1
+          className="text-center text-4xl font-bold mb-8 text-gray-800"
+          data-aos="fade-down"
+        >
+          Our Products
+        </h1>
 
-      {showPopup && addedItem && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3">
-          <FaCheckCircle className="text-2xl" />
-          <span>{addedItem.title} added to cart!</span>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 p-4 mx-10">
-        {products.map((product) => (
+        {showPopup && addedItem && (
           <div
-            key={product._id}
-            onClick={() => handleProductClick(product)}
-            className="bg-white rounded-xl shadow hover:shadow-lg transition duration-300 relative group cursor-pointer overflow-hidden border"
+            className="fixed top-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-3"
+            data-aos="zoom-in"
           >
-            <img
-              alt={product.title}
-              src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`}
-              className="h-68 w-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                {product.title}
-              </h3>
-              <Rate
-                disabled
-                allowHalf
-                defaultValue={product.rating || 0}
-                className="text-yellow-400 mb-2"
-              />
-              <p className=" text-lg font-semibold">
-                AED {product.price}
-              </p>
-            </div>
-
-            {/* Icons */}
-            <div className="absolute top-3 right-3 flex flex-col gap-2">
-              <Tooltip title="Add to Cart">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToCart(product);
-                  }}
-                  className="bg-white p-2 rounded-full shadow hover:bg-blue-100"
-                >
-                  <FaShoppingCart className="text-blue-600" />
-                </button>
-              </Tooltip>
-              {/* <Tooltip title="Add to Wishlist">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleWishlist(product);
-                  }}
-                  className={`bg-white p-2 rounded-full shadow ${
-                    wishlistItems.has(product._id)
-                      ? "text-red-500 hover:bg-red-100"
-                      : "text-gray-500 hover:text-red-500 hover:bg-red-100"
-                  }`}
-                >
-                  <FaHeart />
-                </button>
-              </Tooltip> */}
-            </div>
+            <FaCheckCircle className="text-xl" />
+            <span>{addedItem.title} added to cart!</span>
           </div>
-        ))}
+        )}
+
+        <div className="grid grid-cols-1 mt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          {products.map((product, index) => (
+            <div key={product._id} data-aos="fade-up" data-aos-delay={index * 100}>
+              <Badge.Ribbon
+                text={product.category}
+                color="pink"
+                className="hover:scale-105 transition-transform duration-300"
+              >
+                <Card
+                  hoverable
+                  cover={
+                    <img
+                      alt={product.title}
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`}
+                      className="h-64 object-cover"
+                      onClick={() => handleProductClick(product)}
+                    />
+                  }
+                  className="rounded-xl shadow-md"
+                  // actions={[
+                  //   <Tooltip title="Add to Cart" key="cart">
+                  //     <FaShoppingCart
+                  //       onClick={(e) => {
+                  //         e.stopPropagation();
+                  //         handleAddToCart(product);
+                  //       }}
+                  //       className="text-blue-600 hover:text-blue-800 text-lg"
+                  //     />
+                  //   </Tooltip>,
+                  //   <Tooltip title="Add to Wishlist" key="heart">
+                  //     <FaHeart
+                  //       onClick={(e) => {
+                  //         e.stopPropagation();
+                  //         handleWishlist(product);
+                  //       }}
+                  //       className={`text-lg ${
+                  //         wishlistItems.has(product._id)
+                  //           ? "text-red-500"
+                  //           : "text-gray-400 hover:text-red-500"
+                  //       }`}
+                  //     />
+                  //   </Tooltip>,
+                  // ]}
+                >
+                  <Meta
+                    title={
+                      <span className="text-lg font-semibold text-gray-800">
+                        {product.title}
+                      </span>
+                    }
+                    description={
+                      <>
+                        <Rate
+                          disabled
+                          allowHalf
+                          defaultValue={product.rating || 0}
+                          className="text-yellow-400 mb-2"
+                        />
+                        <div className="text-lg font-bold text-gray-700">
+                          AED {product.price}
+                        </div>
+                      </>
+                    }
+                  />
+                </Card>
+              </Badge.Ribbon>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center mt-10">
+          <Pagination
+            current={page}
+            pageSize={12}
+            total={totalPages * 12}
+            onChange={(value) => setPage(value)}
+            showSizeChanger={false}
+          />
+        </div>
       </div>
 
-      <div className="text-center mt-10 items-center justify-center flex">
-        <Pagination
-          current={page}
-          pageSize={8}
-          total={totalPages * 8}
-          onChange={(value) => setPage(value)}
-          showSizeChanger={false}
-        />
+      <div className="" data-aos="fade-up">
+        <CategoryHero BgImage ={BgImage} content ={true}/>
       </div>
-    </div>
+    </>
   );
 };
 

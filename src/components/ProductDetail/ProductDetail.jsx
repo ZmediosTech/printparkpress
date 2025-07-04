@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { Row, Col, Card, Typography, Pagination, Empty, Spin, Button } from 'antd';
 import { FaShoppingCart } from 'react-icons/fa';
+import CategoryHero from '../CategoryHero.JSX';
+import BgImage from "../../assets/hero/smiley.webp";
+
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -73,7 +76,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className=" min-h-screen p-8 pt-24 mt-12">
+    <><div className=" min-h-screen p-8 pt-24 mt-12">
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <Spin size="large" />
@@ -86,8 +89,7 @@ const ProductDetail = () => {
               <img
                 src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
                 alt={item.title}
-                className="rounded-lg w-full max-w-[500px] h-auto object-contain"
-              />
+                className="rounded-lg w-full max-w-[500px] h-auto object-contain" />
             </Col>
 
             {/* Product Info */}
@@ -149,24 +151,18 @@ const ProductDetail = () => {
                   <Card
                     hoverable
                     onClick={() => navigate(`/product/${product._id}`)}
-                    cover={
-                      <img
-                        alt={product.title}
-                        src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`}
-                        className="h-56 object-cover rounded-t-md"
-                      />
-                    }
+                    cover={<img
+                      alt={product.title}
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`}
+                      className="h-56 object-cover rounded-t-md" />}
                     className="shadow-sm hover:shadow-lg transition-all duration-300"
                   >
                     <Card.Meta
                       title={<span className="font-semibold">{product.title}</span>}
-                      description={
-                        <>
-                          <Paragraph ellipsis={{ rows: 2 }}>{product.description}</Paragraph>
-                          <Text strong className="">AED {product.price}</Text>
-                        </>
-                      }
-                    />
+                      description={<>
+                        <Paragraph ellipsis={{ rows: 2 }}>{product.description}</Paragraph>
+                        <Text strong className="">AED {product.price}</Text>
+                      </>} />
                   </Card>
                 </Col>
               ))}
@@ -179,13 +175,16 @@ const ProductDetail = () => {
                 total={relatedProducts.length}
                 pageSize={productsPerPage}
                 onChange={handlePageChange}
-                showSizeChanger={false}
-              />
+                showSizeChanger={false} />
             </div>
+
           </>
         )}
       </div>
-    </div>
+
+    </div><div className="" data-aos="fade-up">
+        <CategoryHero BgImage ={BgImage} content ={false} />
+      </div></>
   );
 };
 

@@ -1,48 +1,80 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { Button, Typography } from "antd";
+import { Button, Typography, Divider } from "antd";
 import { FaPlus, FaMinus, FaTrash } from "react-icons/fa";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const { Title, Text } = Typography;
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const {
-    cartItems,
-    incrementQuantity,
-    decrementQuantity,
-    removeFromCart,
-  } = useCart();
-console.log(cartItems,"cartItems")
+  const { cartItems, incrementQuantity, decrementQuantity, removeFromCart } =
+    useCart();
+
   const total = cartItems.reduce((sum, item) => {
     const price = parseFloat(item.price);
     return sum + price * (item.quantity || 1);
   }, 0);
 
+  useEffect(() => {
+    AOS.init({ duration: 600 });
+  }, []);
+
   return (
-    <div className="min-h-screen  pt-28 pb-24 px-4 md:px-16 lg:px-32">
-      <Title level={3} className="mb-2 font-semibold">
-        You have {cartItems.length} product{cartItems.length !== 1 && "s"} in your cart
+    <div className="min-h-screen pt-28 pb-24 px-4 md:px-16 lg:px-32 bg-gray-50">
+      <Title
+        level={3}
+        className="mb-4 font-semibold text-center"
+        data-aos="fade-down"
+      >
+        {cartItems.length
+          ? `You have ${cartItems.length} product${
+              cartItems.length > 1 ? "s" : ""
+            } in your cart`
+          : "Your Cart"}
       </Title>
 
       {cartItems.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-500 text-xl">Your cart is empty</p>
+        <div
+          className="flex flex-col items-center justify-center py-16"
+          data-aos="fade-up"
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+            alt="Empty Cart"
+            className="w-60 h-60 object-contain mb-6 animate-bounce"
+          />
+          <p className="text-gray-600 text-xl font-medium mb-4">
+            🛒 Your cart is empty
+          </p>
+          <Button
+            type="primary"
+            className="bg-blue-500 transition-colors duration-300"
+            onClick={() => navigate("/")}
+          >
+            Go Shopping
+          </Button>
         </div>
       ) : (
         <>
-          <div className="text-right text-sm text-gray-500 mb-6">
+          <div
+            className="text-right text-sm text-gray-500 mb-6"
+            data-aos="fade-right"
+          >
             Expected Delivery: <strong className="text-black">Friday</strong>
           </div>
 
-          {cartItems.map((item) => (
+          {cartItems.map((item, index) => (
             <div
               key={item._id}
-              className="grid grid-cols-12 gap-2 py-4 border-b items-center"
+              className="grid grid-cols-12 gap-4 py-4 border-b items-center bg-white px-4 rounded-md shadow-sm mb-2"
+              data-aos="fade-up"
+              data-aos-delay={index * 80}
             >
               {/* Product Info */}
-              <div className="col-span-5 flex gap-4 items-center">
+              <div className="col-span-12 sm:col-span-5 flex gap-4 items-center">
                 <img
                   src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
                   alt={item.title}
@@ -50,25 +82,16 @@ console.log(cartItems,"cartItems")
                 />
                 <div>
                   <Text strong>{item.title}</Text>
-                  {/* <p className="text-sm text-gray-600">
-                    Color: <strong className="text-black">Green-D</strong>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Size: <strong className="text-black">XL</strong>
-                  </p>
-                  <p className="text-xs text-green-600 mt-1">
-                    ● In Stock ({item.stock || "12"} Pcs)
-                  </p> */}
                 </div>
               </div>
 
               {/* Price */}
-              <div className="col-span-2 text-center">
-                Rs. {parseFloat(item.price).toFixed(2)}
+              <div className="col-span-6 sm:col-span-2 text-center font-medium text-gray-800">
+                AED {parseFloat(item.price).toFixed(2)}
               </div>
 
               {/* Quantity Controls */}
-              <div className="col-span-2 flex justify-center items-center gap-2">
+              <div className="col-span-6 sm:col-span-2 flex justify-center items-center gap-2">
                 <Button
                   shape="circle"
                   size="small"
@@ -77,7 +100,9 @@ console.log(cartItems,"cartItems")
                 >
                   <FaMinus size={10} />
                 </Button>
-                <span className="text-sm w-6 text-center">{item.quantity || 1}</span>
+                <span className="text-sm w-6 text-center">
+                  {item.quantity || 1}
+                </span>
                 <Button
                   shape="circle"
                   size="small"
@@ -88,12 +113,12 @@ console.log(cartItems,"cartItems")
               </div>
 
               {/* Total */}
-              <div className="col-span-2 text-right font-medium">
+              <div className="col-span-6 sm:col-span-2 text-right font-semibold text-gray-700">
                 AED {(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}
               </div>
 
               {/* Remove */}
-              <div className="col-span-1 text-center">
+              <div className="col-span-6 sm:col-span-1 text-center">
                 <Button
                   type="text"
                   danger
@@ -105,31 +130,37 @@ console.log(cartItems,"cartItems")
           ))}
 
           {/* Subtotal and Checkout */}
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-8 border-t pt-6">
+          <div
+            className="mt-10 bg-white rounded-lg shadow-md p-6 flex flex-col sm:flex-row justify-between items-center"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
             <Button
               type="text"
-              className="text-black font-semibold hover:underline"
+              className="text-blue-600 font-semibold hover:underline"
               onClick={() => navigate("/")}
             >
-              CONTINUE SHOPPING
+              ← Continue Shopping
             </Button>
 
-            <div className="text-right mt-4 sm:mt-0">
-              <Text className="text-lg">
+            <div className="text-right mt-6 sm:mt-0">
+              <Text className="text-xl text-gray-800">
                 Sub Total:{" "}
-                <span className="font-semibold">
-                  AED. {total.toFixed(2)}
+                <span className="font-bold text-black">
+                  AED {total.toFixed(2)}
                 </span>
               </Text>
-              <p className="text-xs text-gray-500">Excl. Tax and Delivery charge</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Excl. Tax and Delivery charge
+              </p>
 
               <Button
                 type="primary"
                 size="large"
-                className="mt-2 bg-blue-500 px-8 text-white"
+                className="mt-2 bg-blue-600 px-8 text-white hover:bg-blue-700"
                 onClick={() => navigate("/checkout")}
               >
-                GO TO CHECKOUT
+                Go to Checkout
               </Button>
             </div>
           </div>

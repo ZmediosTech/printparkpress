@@ -15,6 +15,8 @@ import {
 } from "antd";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const { Title, Text } = Typography;
 
@@ -22,6 +24,7 @@ const Checkout = () => {
   const { cartItems, clearCart } = useCart();
   const navigate = useNavigate();
   const email = localStorage.getItem("email");
+
   const [loading, setLoading] = useState(false);
   const [addresses, setAddresses] = useState(
     JSON.parse(localStorage.getItem("addresses")) || []
@@ -31,6 +34,10 @@ const Checkout = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [form] = Form.useForm();
   const [showPayment, setShowPayment] = useState(false);
+
+  useEffect(() => {
+    AOS.init({ duration: 600 });
+  }, []);
 
   const handleAddAddress = () => {
     setEditingIndex(null);
@@ -108,6 +115,8 @@ const Checkout = () => {
     };
 
     try {
+      setShowPayment(false);
+
       setLoading(true);
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
         method: "POST",
@@ -118,18 +127,15 @@ const Checkout = () => {
       const data = await res.json();
       if (data.success) {
         setLoading(false);
-
         notification.success({ message: "Order placed!" });
         clearCart();
         navigate("/");
       } else {
         setLoading(false);
-
         notification.error({ message: "Order failed" });
       }
     } catch (err) {
       setLoading(false);
-
       console.error(err);
       notification.error({ message: "Something went wrong" });
     }
@@ -137,11 +143,14 @@ const Checkout = () => {
 
   return (
     <Spin spinning={loading} tip="Placing your order...">
-      <div className="container mx-auto max-w-6xl px-4 py-6 mt-24">
-        <Title level={2}>Checkout</Title>
+      <div className="container mx-auto max-w-6xl px-4 py-8 mt-24">
+        <Title level={2} data-aos="fade-down">
+          Checkout
+        </Title>
+
         <Row gutter={24}>
           {/* Address Section */}
-          <Col xs={24} md={14}>
+          <Col xs={24} md={14} data-aos="fade-right">
             <div className="mb-4 flex justify-between items-center">
               <Title level={4}>Delivery Addresses</Title>
               <Button
@@ -152,16 +161,17 @@ const Checkout = () => {
                 Add Address
               </Button>
             </div>
+
             <List
               itemLayout="vertical"
               dataSource={addresses}
               renderItem={(addr, index) => (
                 <Card
                   key={index}
-                  className={`mb-3 border ${
+                  className={`mb-3 transition-all duration-300 ${
                     selectedIndex === index
-                      ? "border-orange-500 shadow-md"
-                      : "border-gray-200"
+                      ? "border border-blue-500 shadow-md"
+                      : "border border-gray-200"
                   }`}
                 >
                   <Radio
@@ -196,8 +206,8 @@ const Checkout = () => {
           </Col>
 
           {/* Order Summary */}
-          <Col xs={24} md={10}>
-            <Card title="Order Summary">
+          <Col xs={24} md={10} data-aos="fade-left">
+            <Card title="Order Summary" bordered className="shadow-sm">
               <List
                 dataSource={cartItems}
                 renderItem={(item) => (
@@ -208,7 +218,7 @@ const Checkout = () => {
                           src={`${import.meta.env.VITE_IMAGE_BASE_URL}${
                             item.imageUrl
                           }`}
-                          alt={item.name}
+                          alt={item.title}
                           className="w-16 h-16 object-cover rounded"
                         />
                       }
@@ -229,7 +239,7 @@ const Checkout = () => {
               />
               <div className="mt-4 text-right">
                 <Title level={5}>
-                  Total: ₹
+                  Total: AUD
                   {cartItems.reduce(
                     (sum, item) =>
                       sum + parseInt(item.price) * (item.quantity || 1),

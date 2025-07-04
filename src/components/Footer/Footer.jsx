@@ -11,6 +11,7 @@ import {
   FaMobileAlt,
   FaTimes,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const BannerImg = {
   // backgroundImage: `url(${Banner})`,
@@ -43,6 +44,7 @@ const Footer = () => {
       [name]: value,
     }));
   };
+  const nav = useNavigate()
   const handleSubmit = async (e) => {
     setLoading(true);
 
@@ -89,7 +91,7 @@ const Footer = () => {
   // }
   return (
     <>
-      <div style={BannerImg} className="text-white w-full bg-[#B0BEC5]  ">
+      <div style={BannerImg} className=" w-full bg-[#44A0A0]  ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
             data-aos="zoom-in"
@@ -97,7 +99,7 @@ const Footer = () => {
           >
             {/* Company Details */}
             <div>
-              <h1 className="sm:text-3xl text-xl font-bold mb-3 flex items-center gap-3">
+              <h1 className="sm:text-3xl text-white text-xl font-bold mb-3 flex items-center gap-3">
                 <img
                   src={footerLogo}
                   alt="Printpark Press Logo"
@@ -105,8 +107,8 @@ const Footer = () => {
                 />
                 Printpark Press
               </h1>
-              <p className="text-gray-300 text-sm">
-                Glority is a modern, responsive eCommerce web application
+              <p className="text-sm text-white">
+                Printpark Press is a modern, responsive eCommerce web application
                 designed to provide users with a seamless online shopping
                 experience. Built with a user-friendly interface and secure
                 backend, the platform allows customers to browse a wide range of
@@ -115,15 +117,15 @@ const Footer = () => {
             </div>
 
             {/* Footer Links */}
-            <div className="md:col-span-1">
+            <div className="md:col-span-1 text-white">
               <h1 className="text-xl font-bold mb-3">Important Links</h1>
               <ul className="flex flex-col gap-3">
                 {FooterLinks.map((item) => (
                   <li key={item.title}>
                     {item.title === "Contact" ? (
                       <button
-                        onClick={() => setIsContactOpen(true)}
-                        className="cursor-pointer hover:text-orange-500 transition-all duration-200 text-gray-200"
+                        onClick={() => nav("/contact")}
+                        className="cursor-pointer hover:text-orange-500 transition-all duration-200 "
                       >
                         {item.title}
                       </button>
@@ -133,7 +135,7 @@ const Footer = () => {
                         smooth={true}
                         duration={800}
                         offset={-70}
-                        className="cursor-pointer hover:text-orange-500 transition-all duration-200 text-gray-200"
+                        className="cursor-pointer hover:text-orange-500 transition-all duration-200 "
                       >
                         {item.title}
                       </ScrollLink>
@@ -145,16 +147,16 @@ const Footer = () => {
 
             {/* Social & Contact */}
             <div>
-              <h1 className="text-xl font-bold mb-3">Contact Us</h1>
-              <div className="flex items-center gap-3 mb-3">
+              <h1 className="text-xl font-bold mb-3 text-white">Contact Us</h1>
+              <div className="flex items-center gap-3 mb-3 text-white">
                 <FaLocationArrow />
                 <p>Noida, Uttar Pradesh</p>
               </div>
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 text-white mb-6">
                 <FaMobileAlt />
                 <p>+91 123456789</p>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 text-white">
                 <a href="#">
                   <FaInstagram className="text-2xl hover:text-orange-500 transition" />
                 </a>

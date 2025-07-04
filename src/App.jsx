@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Hero from "./components/Hero/Hero";
 import Products from "./components/Products/Products";
 import About from "./components/About/About";
+
 import TopProducts from "./components/TopProducts/TopProducts";
 import Banner from "./components/Banner/Banner";
 import Subscribe from "./components/Subscribe/Subscribe";
@@ -26,6 +27,7 @@ import { Toaster } from "react-hot-toast";
 import ResetPassword from "./components/ResetPassword/ResetPassword";
 import Signup from "./components/signup/signup";
 import Product from "./components/Product/Product";
+import Contact from "./components/Contact/Contact";
 
 function App() {
   const [orderPopup, setOrderPopup] = useState(false);
@@ -58,7 +60,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <div className="bg-gray-100  dark:bg-gray-900 dark:text-white duration-200">
+        <div className="bg-[#F1F1F1]  dark:bg-gray-900 dark:text-white duration-200">
           {showNavbarAndFooter && <Navbar handleOrderPopup={handleOrderPopup} />}
           
           <Toaster position="top-right" reverseOrder={false} />
@@ -70,7 +72,7 @@ function App() {
                 <>
                   <Hero handleOrderPopup={handleOrderPopup} />
                   {/* <About /> */}
-                  <Products handleOrderPopup={handleOrderPopup} />
+                  <Products  handleOrderPopup={handleOrderPopup} />
                   {/* <Banner /> */}
                   {/* <Subscribe /> */}
                   <Testimonials />
@@ -80,6 +82,9 @@ function App() {
             <Route path="/admin" element={<Admin />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/product" element={<Products />} />
+
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<Product />} />
