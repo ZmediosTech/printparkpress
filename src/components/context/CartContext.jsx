@@ -1,72 +1,71 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 const CartContext = createContext();
- 
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem('cartItems');
+    const savedCart = localStorage.getItem("cartItems");
     return savedCart ? JSON.parse(savedCart) : [];
   });
-console.log(cartItems,"cartItems")
+  console.log(cartItems, "cartItems");
   const [savedItems, setSavedItems] = useState(() => {
-    const savedForLater = localStorage.getItem('savedItems');
+    const savedForLater = localStorage.getItem("savedItems");
     return savedForLater ? JSON.parse(savedForLater) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
   useEffect(() => {
-    localStorage.setItem('savedItems', JSON.stringify(savedItems));
+    localStorage.setItem("savedItems", JSON.stringify(savedItems));
   }, [savedItems]);
-  
+
   const removeFromCart = (productId) => {
-    setCartItems(cartItems.filter(item => item._id !== productId));
+    setCartItems(cartItems.filter((item) => item._id !== productId));
   };
-  
+
   const addToCart = (product) => {
-    console.log(product,"product")
-    const existingProduct = cartItems.find(item => item._id === product._id);
+    const existingProduct = cartItems.find((item) => item._id === product._id);
     if (existingProduct) {
-      setCartItems(cartItems.map(item => 
-        item._id == product._id 
-          ? {...item, quantity: (item.quantity || 1) + product.quantity-1}
-          : item
-      ));
-        toast.success("Product already in cart!");
-    
+      setCartItems(
+        cartItems.map((item) =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + product.quantity }
+            : item
+        )
+      );
+      toast.success("Product already in cart! Quantity updated.");
     } else {
-      setCartItems([...cartItems, {...product, quantity: 1}]);
-        toast.success("Product added in cart!");
-   
+      setCartItems([
+        ...cartItems,
+        { ...product, quantity: product.quantity || 1 },
+      ]);
+      toast.success("Product added to cart!");
     }
   };
-  
-  
+
   const updateQuantity = (product, newQuantity) => {
     if (newQuantity < 1) {
       removeFromCart(product);
       return;
     }
     const removeFromCart = (productId) => {
-      setCartItems(cartItems.filter(item => item._id !== productId));
+      setCartItems(cartItems.filter((item) => item._id !== productId));
     };
-    
-    setCartItems(prevItems => 
-      prevItems.map(item => 
-        item._id == product._id
-          ? { ...item, quantity: newQuantity }
-          : item
+
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id == product._id ? { ...item, quantity: newQuantity } : item
       )
     );
   };
 
   const incrementQuantity = (product) => {
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item._id=== product._id
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id === product._id
           ? { ...item, quantity: (item.quantity || 1) + 1 }
           : item
       )
@@ -74,14 +73,14 @@ console.log(cartItems,"cartItems")
   };
 
   const decrementQuantity = (product) => {
-    const item = cartItems.find(item => item._id === product._id);
+    const item = cartItems.find((item) => item._id === product._id);
     if (item && (item.quantity || 1) <= 1) {
       removeFromCart(product);
       return;
     }
-    
-    setCartItems(prevItems =>
-      prevItems.map(item =>
+
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
         item._id === product._id
           ? { ...item, quantity: (item.quantity || 1) - 1 }
           : item
@@ -91,40 +90,44 @@ console.log(cartItems,"cartItems")
 
   const saveForLater = (product) => {
     removeFromCart(product);
-    const existingProduct = savedItems.find(item => item.title === product.title);
+    const existingProduct = savedItems.find(
+      (item) => item.title === product.title
+    );
     if (!existingProduct) {
       setSavedItems([...savedItems, product]);
     }
   };
 
   const moveToCart = (product) => {
-    setSavedItems(savedItems.filter(item => item.title !== product.title));
+    setSavedItems(savedItems.filter((item) => item.title !== product.title));
     addToCart(product);
   };
 
   const removeSavedItem = (product) => {
-    setSavedItems(savedItems.filter(item => item.title !== product.title));
+    setSavedItems(savedItems.filter((item) => item.title !== product.title));
   };
 
   const clearCart = () => {
     setCartItems([]);
-    localStorage.removeItem('cartItems');
+    localStorage.removeItem("cartItems");
   };
 
   return (
-    <CartContext.Provider value={{ 
-      cartItems,
-      savedItems, 
-      addToCart, 
-      updateQuantity,
-      incrementQuantity,
-      decrementQuantity,
-      removeFromCart,
-      clearCart,
-      saveForLater,
-      moveToCart,
-      removeSavedItem
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        savedItems,
+        addToCart,
+        updateQuantity,
+        incrementQuantity,
+        decrementQuantity,
+        removeFromCart,
+        clearCart,
+        saveForLater,
+        moveToCart,
+        removeSavedItem,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -133,7 +136,7 @@ console.log(cartItems,"cartItems")
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };

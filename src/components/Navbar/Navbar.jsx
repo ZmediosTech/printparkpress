@@ -13,7 +13,7 @@ import Logo from "../../assets/hero/logo.png";
 
 const Menu = [
   { id: 1, name: "Home", link: "/" },
-  { id: 3, name: "Product", link: "/product" },
+  { id: 3, name: "Shop", link: "/product" },
   { id: 4, name: "Contact", link: "/contact" },
 ];
 

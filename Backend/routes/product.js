@@ -32,15 +32,28 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 });
 // Get all products
+// /routes/product.js
+
 router.get("/", async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1; // default to page 1
-    const limit = parseInt(req.query.limit) || 16; // default to 10 items per page
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 16;
     const skip = (page - 1) * limit;
+    const sort = req.query.sort || "default"; // default | price_asc | price_desc | recent
+
+    let sortQuery = {};
+
+    if (sort === "price_asc") {
+      sortQuery.price = 1;
+    } else if (sort === "price_desc") {
+      sortQuery.price = -1;
+    } else if (sort === "recent") {
+      sortQuery.createdAt = -1;
+    }
 
     const [products, total] = await Promise.all([
-      Product.find().skip(skip).limit(limit),
-      Product.countDocuments()
+      Product.find().sort(sortQuery).skip(skip).limit(limit),
+      Product.countDocuments(),
     ]);
 
     res.status(200).json({

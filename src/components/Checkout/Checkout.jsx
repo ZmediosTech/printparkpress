@@ -116,7 +116,6 @@ const Checkout = () => {
 
     try {
       setShowPayment(false);
-
       setLoading(true);
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`, {
         method: "POST",
@@ -143,12 +142,12 @@ const Checkout = () => {
 
   return (
     <Spin spinning={loading} tip="Placing your order...">
-      <div className="container mx-auto max-w-6xl px-4 py-8 mt-24">
-        <Title level={2} data-aos="fade-down">
+      <div className="container mx-auto max-w-6xl px-4 py-10 mt-24">
+        <Title level={2} className="mb-6" data-aos="fade-down">
           Checkout
         </Title>
 
-        <Row gutter={24}>
+        <Row gutter={[24, 24]}>
           {/* Address Section */}
           <Col xs={24} md={14} data-aos="fade-right">
             <div className="mb-4 flex justify-between items-center">
@@ -168,35 +167,29 @@ const Checkout = () => {
               renderItem={(addr, index) => (
                 <Card
                   key={index}
-                  className={`mb-3 transition-all duration-300 ${
+                  className={`mb-4 p-4 rounded-lg transition-all duration-300 ${
                     selectedIndex === index
-                      ? "border border-blue-500 shadow-md"
-                      : "border border-gray-200"
+                      ? "border-blue-500 border shadow-md"
+                      : "border-gray-200 border hover:shadow"
                   }`}
                 >
                   <Radio
                     checked={selectedIndex === index}
                     onChange={() => setSelectedIndex(index)}
                   >
-                    <Title level={5}>{addr.name}</Title>
+                    <Title level={5} className="mb-1">{addr.name}</Title>
                     <Text>
-                      {addr.address}, {addr.cityDistrict}, {addr.state}
+                      {addr.address}, {addr.locality}, {addr.cityDistrict},{" "}
+                      {addr.state} - {addr.pincode}
                     </Text>
                     <br />
                     <Text type="secondary">Mobile: {addr.mobile}</Text>
                   </Radio>
-                  <div className="mt-2 flex gap-2">
-                    <Button
-                      size="small"
-                      onClick={() => handleEditAddress(index)}
-                    >
+                  <div className="mt-3 flex gap-2">
+                    <Button size="small" onClick={() => handleEditAddress(index)}>
                       Edit
                     </Button>
-                    <Button
-                      size="small"
-                      danger
-                      onClick={() => handleDeleteAddress(index)}
-                    >
+                    <Button size="small" danger onClick={() => handleDeleteAddress(index)}>
                       Delete
                     </Button>
                   </div>
@@ -207,39 +200,35 @@ const Checkout = () => {
 
           {/* Order Summary */}
           <Col xs={24} md={10} data-aos="fade-left">
-            <Card title="Order Summary" bordered className="shadow-sm">
+            <Card
+              title="Order Summary"
+              bordered
+              className="p-4 rounded-lg shadow-md"
+            >
               <List
                 dataSource={cartItems}
                 renderItem={(item) => (
-                  <List.Item>
+                  <List.Item className="py-2">
                     <List.Item.Meta
                       avatar={
                         <img
-                          src={`${import.meta.env.VITE_IMAGE_BASE_URL}${
-                            item.imageUrl
-                          }`}
+                          src={`${import.meta.env.VITE_IMAGE_BASE_URL}${item.imageUrl}`}
                           alt={item.title}
                           className="w-16 h-16 object-cover rounded"
                         />
                       }
-                      title={
-                        <span className="font-semibold">{item.title}</span>
-                      }
-                      description={
-                        <span className="text-gray-600">
-                          Quantity: {item.quantity}
-                        </span>
-                      }
+                      title={<span className="font-semibold">{item.title}</span>}
+                      description={<span>Quantity: {item.quantity}</span>}
                     />
-                    <div className="font-medium text-right">
-                      ₹{item.quantity * parseInt(item.price)}
+                    <div className="text-right font-semibold text-gray-700">
+                      AUD {item.quantity * parseInt(item.price)}
                     </div>
                   </List.Item>
                 )}
               />
               <div className="mt-4 text-right">
                 <Title level={5}>
-                  Total: AUD
+                  Total: AUD{" "}
                   {cartItems.reduce(
                     (sum, item) =>
                       sum + parseInt(item.price) * (item.quantity || 1),
@@ -272,53 +261,28 @@ const Checkout = () => {
               borderColor: "#1677ff",
               color: "#fff",
             },
-            type: "primary",
           }}
         >
           <Form layout="vertical" form={form}>
-            <Form.Item
-              name="name"
-              label="Full Name"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="name" label="Full Name" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item
-              name="mobile"
-              label="Mobile Number"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="mobile" label="Mobile Number" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item
-              name="pincode"
-              label="Pincode"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="pincode" label="Pincode" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item name="state" label="State" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item
-              name="address"
-              label="Address"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="address" label="Address" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item
-              name="locality"
-              label="Locality"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="locality" label="Locality" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
-            <Form.Item
-              name="cityDistrict"
-              label="City / District"
-              rules={[{ required: true }]}
-            >
+            <Form.Item name="cityDistrict" label="City / District" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
           </Form>
@@ -337,7 +301,6 @@ const Checkout = () => {
               borderColor: "#1677ff",
               color: "#fff",
             },
-            type: "primary",
           }}
         >
           <Radio checked>Cash on Delivery</Radio>

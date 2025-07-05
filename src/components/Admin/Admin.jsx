@@ -86,6 +86,8 @@ const HomePage = () => {
       category: product.category,
       description: product.description,
       price: product.price,
+      originalPrice: product.originalPrice,
+
     });
     setImagePreview(`http://localhost:5000${product.imageUrl}`);
     setFileList([]);
@@ -101,6 +103,8 @@ const HomePage = () => {
 
     formData.append("description", values.description);
     formData.append("price", values.price);
+    formData.append("originalPrice", values.originalPrice);
+
     if (fileList.length > 0) {
       formData.append("image", fileList[0].originFileObj);
     }
@@ -174,12 +178,14 @@ const HomePage = () => {
   const handleAddProduct = async () => {
     const values = await addForm.validateFields();
     const formData = new FormData();
-    formData.append("title", values.title);
-    formData.append("subtitle", values.subtitle);
-    formData.append("category", values.category);
+    formData.append("title", values?.title);
+    formData.append("subtitle", values?.subtitle);
+    formData.append("category", values?.category);
 
-    formData.append("description", values.description);
-    formData.append("price", values.price);
+    formData.append("description", values?.description);
+    formData.append("price", values?.price);
+    formData.append("originalPrice", values?.originalPrice);
+
     if (addFileList.length > 0) {
       formData.append("image", addFileList[0].originFileObj);
     }
@@ -233,7 +239,12 @@ const HomePage = () => {
     {
       title: "Price",
       dataIndex: "price",
-      render: (price) => `₹${price}`,
+      render: (price) => `AUD ${price}`,
+    },
+    {
+      title: "originalPrice",
+      dataIndex: "originalPrice",
+      render: (originalPrice) => `AUD ${originalPrice}`,
     },
     {
       title: "Actions",
@@ -349,7 +360,6 @@ const HomePage = () => {
     { title: "Name", dataIndex: "name" },
     { title: "Message", dataIndex: "message" },
     { title: "Email", dataIndex: "email" },
-  
   ];
 
   return (
@@ -358,7 +368,12 @@ const HomePage = () => {
         <div style={{ color: "white", textAlign: "center", padding: 16 }}>
           Admin
         </div>
-        <img  onClick={() => navigate("/")}src={Logo} alt="Logo" className="w-14 h-14 px-2 mx-4 object-contain" />
+        <img
+          onClick={() => navigate("/")}
+          src={Logo}
+          alt="Logo"
+          className="w-14 h-14 px-2 mx-4 object-contain"
+        />
         <Menu
           theme="dark"
           mode="inline"
@@ -427,10 +442,7 @@ const HomePage = () => {
             </Card>
           )}
           {menuKey === "contact" && (
-            <Card
-              title="Contact List"
-              
-            >
+            <Card title="Contact List">
               <Table
                 dataSource={contact}
                 columns={contactColumns}
@@ -506,7 +518,14 @@ const HomePage = () => {
               <Select.Option value="New Release">New Release</Select.Option>
             </Select>
           </Form.Item>
-          <Form.Item name="price" label="Price" rules={[{ required: true }]}>
+          <Form.Item
+            name="originalPrice"
+            label="OriginalPrice"
+            rules={[{ required: true }]}
+          >
+            <InputNumber style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item name="price" label="DiscountPrice" rules={[{ required: true }]}>
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item label="Image">
@@ -589,10 +608,17 @@ const HomePage = () => {
               <Select.Option value="New Release">New Release</Select.Option>
             </Select>
           </Form.Item>
-
-          <Form.Item name="price" label="Price" rules={[{ required: true }]}>
+          <Form.Item
+            name="originalPrice"
+            label="OriginalPrice"
+            rules={[{ required: true }]}
+          >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
+          <Form.Item name="price" label="DiscountPrice" rules={[{ required: true }]}>
+            <InputNumber style={{ width: "100%" }} />
+          </Form.Item>
+
           <Form.Item label="Image" required>
             <Upload
               beforeUpload={() => false}

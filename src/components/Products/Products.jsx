@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
-import { Pagination, Modal, Rate, Tooltip, Card, Badge } from "antd";
+import { Pagination, Rate, Card, Badge } from "antd";
 import { toast } from "react-hot-toast";
-import { FaShoppingCart, FaHeart, FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import CategoryHero from "../CategoryHero.JSX";
-// import BgImage from "../assets/hero/doorstep.webp";
 import BgImage from "../../assets/hero/doorstep.webp";
-
 
 const { Meta } = Card;
 
-const Products = () => {
+const Products = ({show}) => {
   const navigate = useNavigate();
   const [wishlistItems, setWishlistItems] = useState(new Set());
   const [showPopup, setShowPopup] = useState(false);
@@ -21,6 +19,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sort, setSort] = useState("default");
 
   const { addToCart } = useCart();
   let email = localStorage.getItem("email");
@@ -76,7 +75,9 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/products?page=${page}&limit=12`
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/products?page=${page}&limit=12&sort=${sort}`
       );
       const data = await response.json();
       if (response.ok) {
@@ -92,11 +93,11 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [page]);
+  }, [page, sort]);
 
   return (
     <>
-      <div className="px-4 sm:px-8 md:px-16 my-6">
+      <div className="px-4 sm:px-8 md:px-44 my-6">
         <h1
           className="text-center text-4xl font-bold mb-8 text-gray-800"
           data-aos="fade-down"
@@ -113,75 +114,100 @@ const Products = () => {
             <span>{addedItem.title} added to cart!</span>
           </div>
         )}
+        <div className="flex justify-end mb-6 ">
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className={`border border-gray-300 px-4 py-2 rounded shadow-sm ${show ? 'mt-8' : 'mt-0'}`}
+
+          >
+            <option value="default">Default</option>
+            <option value="price_asc">Price (low to high)</option>
+            <option value="price_desc">Price (high to low)</option>
+            <option value="recent">Most recent</option>
+          </select>
+        </div>
 
         <div className="grid grid-cols-1 mt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {products.map((product, index) => (
-            <div key={product._id} data-aos="fade-up" data-aos-delay={index * 100}>
-              <Badge.Ribbon
-                text={product.category}
-                color="pink"
-                className="hover:scale-105 transition-transform duration-300"
+          {products.map((product, index) => {
+            const original = product.originalPrice || product.price;
+            const current = product.price;
+            const discountPercentage =
+              original && current && original > current
+                ? Math.round(((original - current) / original) * 100)
+                : 0;
+
+            return (
+              <div
+                key={product._id}
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
               >
-                <Card
-                  hoverable
-                  cover={
-                    <img
-                      alt={product.title}
-                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`}
-                      className="h-64 object-cover"
-                      onClick={() => handleProductClick(product)}
-                    />
+                <Badge.Ribbon
+                  text={
+                    // discountPercentage > 0
+                    //   ? `${discountPercentage}% OFF`
+                    //   :
+                    product.category
                   }
-                  className="rounded-xl shadow-md"
-                  // actions={[
-                  //   <Tooltip title="Add to Cart" key="cart">
-                  //     <FaShoppingCart
-                  //       onClick={(e) => {
-                  //         e.stopPropagation();
-                  //         handleAddToCart(product);
-                  //       }}
-                  //       className="text-blue-600 hover:text-blue-800 text-lg"
-                  //     />
-                  //   </Tooltip>,
-                  //   <Tooltip title="Add to Wishlist" key="heart">
-                  //     <FaHeart
-                  //       onClick={(e) => {
-                  //         e.stopPropagation();
-                  //         handleWishlist(product);
-                  //       }}
-                  //       className={`text-lg ${
-                  //         wishlistItems.has(product._id)
-                  //           ? "text-red-500"
-                  //           : "text-gray-400 hover:text-red-500"
-                  //       }`}
-                  //     />
-                  //   </Tooltip>,
-                  // ]}
+                  color={discountPercentage > 0 ? "red" : "blue"}
+                  className="hover:scale-105 transition-transform duration-300"
                 >
-                  <Meta
-                    title={
-                      <span className="text-lg font-semibold text-gray-800">
-                        {product.title}
-                      </span>
+                  <Card
+                    hoverable
+                    cover={
+                      <img
+                        alt={product.title}
+                        src={`${import.meta.env.VITE_IMAGE_BASE_URL}${
+                          product.imageUrl
+                        }`}
+                        className="h-64 object-cover cursor-pointer rounded-t-xl"
+                        onClick={() => handleProductClick(product)}
+                      />
                     }
-                    description={
-                      <>
-                        <Rate
-                          disabled
-                          allowHalf
-                          defaultValue={product.rating || 0}
-                          className="text-yellow-400 mb-2"
-                        />
-                        <div className="text-lg font-bold text-gray-700">
-                          AED {product.price}
-                        </div>
-                      </>
-                    }
-                  />
-                </Card>
-              </Badge.Ribbon>
-            </div>
-          ))}
+                    className="rounded-xl shadow-md"
+                  >
+                    <Meta
+                      title={
+                        <span className="text-base font-semibold text-gray-800">
+                          {product.title}
+                        </span>
+                      }
+                      description={
+                        <>
+                          <Rate
+                            disabled
+                            allowHalf
+                            defaultValue={product.rating || 0}
+                            className="text-yellow-400 mb-2 text-sm"
+                          />
+                          {discountPercentage > 0 ? (
+                            <>
+                              <div className="flex items-center gap-2">
+                                <span className="line-through text-gray-400 text-sm">
+                                  AED {original}
+                                </span>
+                                <span className="text-green-600 font-bold text-lg">
+                                  AED {current}
+                                </span>
+                              </div>
+                              <div className="text-xs text-red-500 font-medium mt-1">
+                                Save {discountPercentage}%
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-lg font-bold text-gray-700">
+                              AED {current}
+                            </div>
+                          )}
+                        </>
+                      }
+                    />
+                  </Card>
+                </Badge.Ribbon>
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex justify-center mt-10">
@@ -196,7 +222,7 @@ const Products = () => {
       </div>
 
       <div className="" data-aos="fade-up">
-        <CategoryHero BgImage ={BgImage} content ={true}/>
+        <CategoryHero BgImage={BgImage} content={true} />
       </div>
     </>
   );

@@ -72,7 +72,7 @@ function App() {
                 <>
                   <Hero handleOrderPopup={handleOrderPopup} />
                   {/* <About /> */}
-                  <Products  handleOrderPopup={handleOrderPopup} />
+                  <Products show ={false}  handleOrderPopup={handleOrderPopup} />
                   {/* <Banner /> */}
                   {/* <Subscribe /> */}
                   <Testimonials />
@@ -83,7 +83,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/product" element={<Products />} />
+            <Route path="/product" element={<Products show ={true} />} />
 
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />
