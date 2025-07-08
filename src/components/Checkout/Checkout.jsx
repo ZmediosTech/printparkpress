@@ -143,14 +143,14 @@ const Checkout = () => {
   return (
     <Spin spinning={loading} tip="Placing your order...">
       <div className="container mx-auto max-w-6xl px-4 py-10 mt-24">
-        <Title level={2} className="mb-6" data-aos="fade-down">
+        <Title level={2} className="mb-6 text-center md:text-left" data-aos="fade-down">
           Checkout
         </Title>
 
         <Row gutter={[24, 24]}>
           {/* Address Section */}
           <Col xs={24} md={14} data-aos="fade-right">
-            <div className="mb-4 flex justify-between items-center">
+            <div className="mb-4 flex justify-between items-center flex-wrap gap-3">
               <Title level={4}>Delivery Addresses</Title>
               <Button
                 type="primary"
@@ -178,14 +178,15 @@ const Checkout = () => {
                     onChange={() => setSelectedIndex(index)}
                   >
                     <Title level={5} className="mb-1">{addr.name}</Title>
-                    <Text>
+                    <Text className="block">
                       {addr.address}, {addr.locality}, {addr.cityDistrict},{" "}
                       {addr.state} - {addr.pincode}
                     </Text>
-                    <br />
-                    <Text type="secondary">Mobile: {addr.mobile}</Text>
+                    <Text type="secondary" className="block mt-1">
+                      Mobile: {addr.mobile}
+                    </Text>
                   </Radio>
-                  <div className="mt-3 flex gap-2">
+                  <div className="mt-3 flex gap-2 flex-wrap">
                     <Button size="small" onClick={() => handleEditAddress(index)}>
                       Edit
                     </Button>
@@ -262,6 +263,7 @@ const Checkout = () => {
               color: "#fff",
             },
           }}
+          bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}
         >
           <Form layout="vertical" form={form}>
             <Form.Item name="name" label="Full Name" rules={[{ required: true }]}>

@@ -8,9 +8,9 @@ import {
   Row,
   Col,
   Typography,
-  Divider,
   Space,
   message,
+  Popconfirm,
 } from "antd";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -19,9 +19,9 @@ const { Title, Text } = Typography;
 
 const Profile = () => {
   const [form] = Form.useForm();
-  const [infoForm] = Form.useForm();
-
-  const [addresses, setAddresses] = useState(JSON.parse(localStorage.getItem("addresses")) || []);
+  const [addresses, setAddresses] = useState(
+    JSON.parse(localStorage.getItem("addresses")) || []
+  );
   const [showModal, setShowModal] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
 
@@ -72,93 +72,149 @@ const Profile = () => {
     message.success("Address removed");
   };
 
-  const handleUserInfoSave = (values) => {
-    setUserInfo(values);
-    message.success("Profile updated");
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 text-center py-10 mt-16 px-4 md:px-16">
-      <Title level={2} data-aos="fade-down">My Profile</Title>
+    <div className="min-h-screen bg-gray-100 pt-24 px-4 sm:px-6 lg:px-20">
+      <div className="max-w-7xl mx-auto">
+        <Title level={2} className="text-center mb-8 mt-4" data-aos="fade-down">
+          My Profile
+        </Title>
 
-    
+        <Card
+          title="My Addresses"
+          className="shadow-xl rounded-xl mb-12"
+          extra={
+            <Button
+              className="bg-blue-500"
+              type="primary"
+              onClick={() => openModal()}
+              data-aos="zoom-in"
+            >
+              Add Address
+            </Button>
+          }
+          data-aos="fade-up"
+        >
+          <Row gutter={[24, 24]}>
+            {addresses.length === 0 ? (
+              <Col span={24}>
+                <Text type="secondary">No address added yet.</Text>
+              </Col>
+            ) : (
+              addresses.map((address, index) => (
+                <Col xs={24} sm={12} md={8} key={index} data-aos="fade-up">
+                  <Card
+                    type="inner"
+                    title={<Text strong>{address.name}</Text>}
+                    className="rounded-lg shadow-md"
+                    actions={[
+                      <Button type="link" onClick={() => openModal(index)}>
+                        Edit
+                      </Button>,
+                      <Popconfirm
+                        title="Are you sure to delete this address?"
+                        onConfirm={() => handleDelete(index)}
+                        okText="Yes"
+                        cancelText="No"
+                        okButtonProps={{
+                          type: "primary",
+                          style: {
+                            backgroundColor: "#1677ff",
+                            borderColor: "#1677ff",
+                          },
+                        }}
+                      >
+                        <Button type="link" danger>
+                          Delete
+                        </Button>
+                      </Popconfirm>,
+                    ]}
+                  >
+                    <Space direction="vertical" size="small">
+                      <Text>{address.address}</Text>
+                      <Text>
+                        {address.locality}, {address.cityDistrict}
+                      </Text>
+                      <Text>
+                        {address.state} - {address.pincode}
+                      </Text>
+                      <Text>📞 {address.mobile}</Text>
+                    </Space>
+                  </Card>
+                </Col>
+              ))
+            )}
+          </Row>
+        </Card>
 
-      {/* Address Section */}
-      <Card
-        title="My Addresses"
-        extra={
-          <Button className="bg-blue-500" type="primary" onClick={() => openModal()} data-aos="zoom-in">
-            Add Address
-          </Button>
-        }
-        className="shadow-lg my-12"
-        data-aos="fade-up"
-      >
-        <Row gutter={[16, 16]}>
-          {addresses.length === 0 && (
-            <Col span={24}>
-              <Text type="secondary">No address added yet.</Text>
-            </Col>
-          )}
-          {addresses.map((address, index) => (
-            <Col xs={24} md={12} lg={8} key={index} data-aos="fade-up">
-              <Card
-                type="inner"
-                title={address.name}
-                actions={[
-                  <Button type="link" onClick={() => openModal(index)}>Edit</Button>,
-                  <Button type="link" danger onClick={() => handleDelete(index)}>Delete</Button>,
-                ]}
-              >
-                <Space direction="vertical" size={0}>
-                  <Text>{address.address}</Text>
-                  <Text>{address.locality}, {address.cityDistrict}</Text>
-                  <Text>{address.state} - {address.pincode}</Text>
-                  <Text>📞 {address.mobile}</Text>
-                </Space>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Card>
-
-      {/* Address Modal */}
-      <Modal
-        title={editIndex !== null ? "Edit Address" : "Add New Address"}
-        open={showModal}
-        onCancel={() => setShowModal(false)}
-        onOk={() => form.submit()}
-        okText="Save"
-        destroyOnClose 
-           okButtonProps={{
-          type: "primary",
-          style: { backgroundColor: "#1677ff", borderColor: "#1677ff" },
-        }}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSave}>
-          <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-            <Input placeholder="Full Name" />
-          </Form.Item>
-          <Form.Item name="mobile" label="Mobile" rules={[{ required: true }]}>
-            <Input placeholder="Mobile number" />
-          </Form.Item>
-          <Form.Item name="pincode" label="Pincode" rules={[{ required: true }]}>
-            <Input placeholder="Pincode" />
-          </Form.Item>
-          <Form.Item name="state" label="State" rules={[{ required: true }]}>
-            <Input placeholder="State" />
-          </Form.Item>
-          <Form.Item name="address" label="Address" rules={[{ required: true }]}>
-            <Input.TextArea rows={2} placeholder="House No, Street, Area" />
-          </Form.Item>
-          <Form.Item name="locality" label="Locality" rules={[{ required: true }]}>
-            <Input placeholder="Locality" />
-          </Form.Item>
-          <Form.Item name="cityDistrict" label="City/District" rules={[{ required: true }]}>
-            <Input placeholder="City/District" />
-          </Form.Item>
-        </Form>
-      </Modal>
+        {/* Address Modal */}
+        <Modal
+          title={editIndex !== null ? "Edit Address" : "Add New Address"}
+          open={showModal}
+          onCancel={() => setShowModal(false)}
+          onOk={() => form.submit()}
+          okText="Save"
+          destroyOnClose
+          width={600}
+          
+          okButtonProps={{
+            type: "primary",
+            style: { backgroundColor: "#1677ff", borderColor: "#1677ff" },
+          }}
+        >
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSave}
+            className="pt-2"
+          >
+            <Form.Item
+              name="name"
+              label="Full Name"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Full Name" />
+            </Form.Item>
+            <Form.Item
+              name="mobile"
+              label="Mobile Number"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Mobile number" />
+            </Form.Item>
+            <Form.Item
+              name="pincode"
+              label="Pincode"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Pincode" />
+            </Form.Item>
+            <Form.Item name="state" label="State" rules={[{ required: true }]}>
+              <Input placeholder="State" />
+            </Form.Item>
+            <Form.Item
+              name="address"
+              label="Full Address"
+              rules={[{ required: true }]}
+            >
+              <Input.TextArea rows={2} placeholder="House No, Street, Area" />
+            </Form.Item>
+            <Form.Item
+              name="locality"
+              label="Locality"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Locality" />
+            </Form.Item>
+            <Form.Item
+              name="cityDistrict"
+              label="City / District"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="City/District" />
+            </Form.Item>
+          </Form>
+        </Modal>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link as ScrollLink } from "react-scroll";
 import footerLogo from "../../assets/logo.jpeg";
+import BgImage from "../../assets/hero/home.webp"; 
+// <- imported background
+import Logo from "../../assets/hero/logo.png";
+
+
 import Banner from "../../assets/website/footer-pattern.jpg";
 import {
   FaFacebook,
@@ -101,9 +106,9 @@ const Footer = () => {
             <div>
               <h1 className="sm:text-3xl text-white text-xl font-bold mb-3 flex items-center gap-3">
                 <img
-                  src={footerLogo}
+                  src={Logo}
                   alt="Printpark Press Logo"
-                  className="max-w-[50px]"
+                  className="  h-12 w-24 object-cover"
                 />
                 Printpark Press
               </h1>
@@ -150,7 +155,7 @@ const Footer = () => {
               <h1 className="text-xl font-bold mb-3 text-white">Contact Us</h1>
               <div className="flex items-center gap-3 mb-3 text-white">
                 <FaLocationArrow />
-                <p>Noida, Uttar Pradesh</p>
+                <p>Burj Khalifa, Dubai</p>
               </div>
               <div className="flex items-center gap-3 text-white mb-6">
                 <FaMobileAlt />

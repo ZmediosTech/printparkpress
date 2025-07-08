@@ -87,7 +87,7 @@ const CartPage = () => {
 
               {/* Price */}
               <div className="col-span-6 sm:col-span-2 text-center font-medium text-gray-800">
-                AED {parseFloat(item.price).toFixed(2)}
+                AUD {parseFloat(item.price).toFixed(2)}
               </div>
 
               {/* Quantity Controls */}
@@ -114,7 +114,7 @@ const CartPage = () => {
 
               {/* Total */}
               <div className="col-span-6 sm:col-span-2 text-right font-semibold text-gray-700">
-                AED {(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}
+                AUD {(parseFloat(item.price) * (item.quantity || 1)).toFixed(2)}
               </div>
 
               {/* Remove */}
@@ -147,7 +147,7 @@ const CartPage = () => {
               <Text className="text-xl text-gray-800">
                 Sub Total:{" "}
                 <span className="font-bold text-black">
-                  AED {total.toFixed(2)}
+                  AUD {total.toFixed(2)}
                 </span>
               </Text>
               <p className="text-xs text-gray-500 mt-1">

@@ -47,9 +47,9 @@ const generateUserEmail = (order) => `
     </tbody>
   </table>
   <p><strong>Total:</strong> ₹${order.totalAmount}</p>
-  <p> <strong>Shipping to </strong>: ${order.user.address.street}, ${order.user.address.city} - ${
-  order.user.address.pincode
-}</p>
+  <p> <strong>Shipping to </strong>: ${order.user.address.street}, ${
+  order.user.address.city
+} - ${order.user.address.pincode}</p>
 `;
 
 const generateAdminEmail = (order) => `
@@ -85,6 +85,40 @@ const generateAdminEmail = (order) => `
   </table>
   <p><strong>Total:</strong> ₹${order.totalAmount}</p>
   <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+`;
+
+const generateCancelAdminEmail = (order) => `
+  <h2>Order Cancelled</h2>
+  <p><strong>Customer:</strong> ${order.user.fullName} (${order.user.email})</p>
+  <p><strong>Mobile:</strong> ${order.user.mobile}</p>
+  <p><strong>Address:</strong> ${order.user.address.street}, ${
+  order.user.address.city
+} - ${order.user.address.pincode}</p>
+  <h3>Cancelled Order Details:</h3>
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="text-align: left;">Product</th>
+        <th>Qty</th>
+        <th>Image</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${order.products
+        .map(
+          (item) => `
+        <tr>
+          <td>${item.name}</td>
+          <td style="text-align: center;">${item.quantity}</td>
+          <td><img src="${process.env.BACKEND_URL}${item.image}" alt="${item.name}" style="width: 60px; height: auto;" /></td>
+        </tr>
+      `
+        )
+        .join("")}
+    </tbody>
+  </table>
+  <p><strong>Total:</strong> ₹${order.totalAmount}</p>
+  <p><strong>Cancelled At:</strong> ${new Date().toLocaleString()}</p>
 `;
 
 // Create new order
@@ -201,6 +235,144 @@ router.get("/:id", async (req, res) => {
     });
   }
 });
+
+// Cancel an all order by ID
+router.put("/cancel/:id", async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: "Order not found",
+      });
+    }
+
+    if (order.status === "Cancelled") {
+      return res.status(400).json({
+        success: false,
+        error: "Order is already cancelled",
+      });
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+
+    // Send notification email to admin
+    await transporter.sendMail({
+      from: "arihant@yopmail.com",
+      to: "manish@yopmail.com", // admin email
+      subject: "Order Cancelled by User",
+      html: generateCancelAdminEmail(order),
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Order cancelled and admin notified",
+      data: order,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+// cancel single product of an order
+router.put("/cancel-product/:orderId/:productId", async (req, res) => {
+  try {
+    const { orderId, productId } = req.params;
+    console.log(orderId, productId, "manish");
+
+    const order = await Order.findById(orderId);
+    console.log(order, "order");
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: "Order not found" });
+    }
+
+    const product = order.products.find(
+      (item) => item.productId.toString() == productId
+    );
+
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Product not found in order" });
+    }
+
+    if (product.status === "Cancelled") {
+      return res
+        .status(400)
+        .json({ success: false, error: "Product already cancelled" });
+    }
+
+    product.status = "Cancelled";
+    // if all products has status cancelled then order.status =="cancelled"
+    const allProductsCancelled = order.products.every(
+      (item) => item.status === "Cancelled"
+    );
+    if (allProductsCancelled) {
+      order.status = "Cancelled";
+    }
+
+    await order.save();
+
+    // Email to admin about cancelled item
+    const cancelItemEmail = `
+      <h3>Product Cancelled in Order</h3>
+      <p><strong>Order ID:</strong> ${order._id}</p>
+      <p><strong>User:</strong> ${order.user.fullName} (${order.user.email})</p>
+      <table>
+        <tr>
+          <td><strong>Product:</strong></td><td>${product.name}</td>
+        </tr>
+        <tr>
+          <td><strong>Quantity:</strong></td><td>${product.quantity}</td>
+        </tr>
+        <tr>
+          <td><strong>Price:</strong></td><td>₹${product.price}</td>
+        </tr>
+      </table>
+      <p>Cancelled on: ${new Date().toLocaleString()}</p>
+    `;
+
+    await transporter.sendMail({
+      from: "arihant@yopmail.com",
+      to: "manish@yopmail.com",
+      subject: "Item Cancelled in Order",
+      html: cancelItemEmail,
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Product cancelled successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+// PUT /orders/update-product-status/:orderId/:productId
+router.put('/update-product-status/:orderId/:productId', async (req, res) => {
+  try {
+    const { orderId, productId } = req.params;
+    const { status } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ success: false, error: "Order not found" });
+
+    const product = order.products.find(p => p.productId.toString() === productId);
+    if (!product) return res.status(404).json({ success: false, error: "Product not found in order" });
+
+    product.status = status;
+    await order.save();
+
+    res.status(200).json({ success: true, message: "Product status updated" });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 
 router.get("/user/:email", async (req, res) => {
   try {

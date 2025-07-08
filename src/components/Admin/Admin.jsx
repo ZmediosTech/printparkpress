@@ -87,7 +87,6 @@ const HomePage = () => {
       description: product.description,
       price: product.price,
       originalPrice: product.originalPrice,
-
     });
     setImagePreview(`http://localhost:5000${product.imageUrl}`);
     setFileList([]);
@@ -214,6 +213,32 @@ const HomePage = () => {
   useEffect(() => {
     if (menuKey === "contact") fetchContact();
   }, [menuKey]);
+  const handleStatusChange = async (orderId, productId, newStatus) => {
+    try {
+      const res = await fetch(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/orders/update-product-status/${orderId}/${productId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        message.success("Product status updated");
+        fetchOrders()
+        // Ideally refetch orders here to reflect UI changes
+      } else {
+        message.error(data.error || "Update failed");
+      }
+    } catch (err) {
+      console.error("Status update error:", err);
+      message.error("Server error");
+    }
+  };
 
   const productColumns = [
     {
@@ -344,7 +369,41 @@ const HomePage = () => {
         </div>
       ),
     },
-
+    {
+      title: "Status",
+      dataIndex: "products",
+      render: (products, record) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {products?.map((p) => (
+            <div
+              key={p._id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                background: "#fafafa",
+                padding: 6,
+                borderRadius: 4,
+              }}
+            >
+              <Select
+                value={p.status || "Processing"}
+                style={{ width: 140 }}
+                onChange={(value) =>
+                  handleStatusChange(record._id, p.productId, value)
+                }
+                options={[
+                  { label: "Processing", value: "Processing" },
+                  { label: "Shipped", value: "Shipped" },
+                  { label: "Delivered", value: "Delivered" },
+                  { label: "Cancelled", value: "Cancelled" },
+                ]}
+              />
+            </div>
+          ))}
+        </div>
+      ),
+    },
     {
       title: "Total",
       render: (record) => {
@@ -525,7 +584,11 @@ const HomePage = () => {
           >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="price" label="DiscountPrice" rules={[{ required: true }]}>
+          <Form.Item
+            name="price"
+            label="DiscountPrice"
+            rules={[{ required: true }]}
+          >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
           <Form.Item label="Image">
@@ -610,12 +673,41 @@ const HomePage = () => {
           </Form.Item>
           <Form.Item
             name="originalPrice"
-            label="OriginalPrice"
-            rules={[{ required: true }]}
+            label="Original Price"
+            rules={[
+              { required: true, message: "Please enter the original price" },
+              {
+                validator: (_, value) =>
+                  value >= 0
+                    ? Promise.resolve()
+                    : Promise.reject("Original price cannot be negative"),
+              },
+            ]}
           >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="price" label="DiscountPrice" rules={[{ required: true }]}>
+
+          <Form.Item
+            name="price"
+            label="Discount Price"
+            rules={[
+              { required: true, message: "Please enter the discount price" },
+              {
+                validator: (_, value) => {
+                  const originalPrice = addForm.getFieldValue("originalPrice");
+                  if (value < 0) {
+                    return Promise.reject("Discount price cannot be negative");
+                  }
+                  if (originalPrice !== undefined && value >= originalPrice) {
+                    return Promise.reject(
+                      "Discount price must be less than original price"
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
 

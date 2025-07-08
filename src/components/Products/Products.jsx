@@ -185,10 +185,10 @@ const Products = ({show}) => {
                             <>
                               <div className="flex items-center gap-2">
                                 <span className="line-through text-gray-400 text-sm">
-                                  AED {original}
+                                  AUD {original}
                                 </span>
                                 <span className="text-green-600 font-bold text-lg">
-                                  AED {current}
+                                  AUD {current}
                                 </span>
                               </div>
                               <div className="text-xs text-red-500 font-medium mt-1">
@@ -197,7 +197,7 @@ const Products = ({show}) => {
                             </>
                           ) : (
                             <div className="text-lg font-bold text-gray-700">
-                              AED {current}
+                              AUD {current}
                             </div>
                           )}
                         </>
