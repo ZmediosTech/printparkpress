@@ -13,7 +13,11 @@ import wishlistRoutes from "./routes/wishlist.js";
 import contactRoutes from "./routes/contact.js";
 import subscribeRoutes from "./routes/subscribe.js";
 import reviewRoutes from "./routes/review.js"
+import cartRoutes from "./routes/cart.js";
+import addressRoutes from "./routes/address.js"
 import path from "path";
+import "./swagger.js"
+
 // Load env vars
 dotenv.config();
 
@@ -37,8 +41,8 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/subscribe", subscribeRoutes);
 app.use("/api/reviews", reviewRoutes);
-
-
+app.use("/api/cart", cartRoutes);
+app.use("/api/users", addressRoutes); 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

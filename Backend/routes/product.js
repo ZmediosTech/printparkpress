@@ -71,7 +71,34 @@ router.get("/", async (req, res) => {
   }
 });
 
-// get single product by id
+// GET /products/search?query=shirt
+router.get("/search", async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    if (!query) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Search query is required" });
+    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const results = await Product.find({
+      title: { $regex: query, $options: "i" },
+    })
+      .skip(skip)
+      .limit(limit);
+
+    res
+      .status(200)
+      .json({ success: true, count: results.length, data: results });
+  } catch (err) {
+    console.error("Search Error:", err);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
 
 // GET a single product by ID
 router.get("/:id", async (req, res) => {

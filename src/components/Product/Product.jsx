@@ -18,7 +18,9 @@ const AdminProductPanel = () => {
   const [editingId, setEditingId] = useState(null); // Track product being edited
   const fileInputRef = useRef();
   const fetchProducts = async () => {
-    const res = await axios.get("http://localhost:5000/api/products");
+    // const res = await axios.get("http://localhost:5000/api/products");
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/products`);
+
     setProducts(res.data?.data);
   };
 
@@ -56,7 +58,9 @@ const AdminProductPanel = () => {
         }
 
         await axios.put(
-          `http://localhost:5000/api/products/${editingId}`,
+          // `http://localhost:5000/api/products/${editingId}`,
+          `${import.meta.env.VITE_API_BASE_URL}/products/${editingId}`,
+
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -71,7 +75,9 @@ const AdminProductPanel = () => {
         }
 
         const res = await axios.post(
-          "http://localhost:5000/api/products",
+          //"http://localhost:5000/api/products",
+          `${import.meta.env.VITE_API_BASE_URL}/products`,
+
           data,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -121,7 +127,9 @@ subTitle:"",
       originalPrice: product.originalPrice || "",
     });
     setEditingId(product._id);
-    setPreviewUrl(`http://localhost:5000${product.imageUrl}`);
+
+
+    setPreviewUrl(`${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`);
     setFile(null); // prevent overriding image unless user selects new
   };
 
@@ -132,7 +140,10 @@ subTitle:"",
     if (!confirm) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      // await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/products/${id}`);
+    
+    
       fetchProducts();
       toast.success("Product deleted.");
     } catch (err) {
@@ -273,7 +284,10 @@ subTitle:"",
                 className="bg-white rounded-xl shadow p-4 hover:shadow-md transition"
               >
                 <img
-                  src={`http://localhost:5000${product?.imageUrl}`}
+                  // src={`http://localhost:5000${product?.imageUrl}`}
+                    src={`${import.meta.env.VITE_IMAGE_BASE_URL}${product?.imageUrl}`}
+                
+                
                   alt={product.title}
                   className="w-full h-40 object-cover rounded mb-3"
                 />

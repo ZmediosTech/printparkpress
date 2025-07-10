@@ -53,18 +53,19 @@ function App() {
   }, []);
 
   if (error) return <div>Error: {error.message}</div>;
-
+  const userId = localStorage.getItem("userId");
   const excludedPaths = ["/login", "/signup", "/reset-password", "/admin"];
-  const showNavbarAndFooter = !excludedPaths.includes(location.pathname);
+  const showNavbarAndFooter = !excludedPaths.includes(location?.pathname);
 
   return (
     <AuthProvider>
-      <CartProvider>
         <div className="bg-[#F1F1F1]  dark:bg-gray-900 dark:text-white duration-200">
-          {showNavbarAndFooter && <Navbar handleOrderPopup={handleOrderPopup} />}
-          
+          {showNavbarAndFooter && (
+            <Navbar handleOrderPopup={handleOrderPopup} />
+          )}
+
           <Toaster position="top-right" reverseOrder={false} />
-          
+
           <Routes>
             <Route
               path="/"
@@ -72,7 +73,7 @@ function App() {
                 <>
                   <Hero handleOrderPopup={handleOrderPopup} />
                   {/* <About /> */}
-                  <Products show ={false}  handleOrderPopup={handleOrderPopup} />
+                  <Products show={false} handleOrderPopup={handleOrderPopup} />
                   {/* <Banner /> */}
                   {/* <Subscribe /> */}
                   <Testimonials />
@@ -83,7 +84,7 @@ function App() {
             <Route path="/cart" element={<CartPage />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/product" element={<Products show ={true} />} />
+            <Route path="/product" element={<Products show={true} />} />
 
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/profile" element={<Profile />} />
@@ -95,20 +96,19 @@ function App() {
             <Route path="/myOrders" element={<MyOrders />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route 
-              path="*" 
+            <Route
+              path="*"
               element={
                 <div className="text-center py-20 text-xl">
                   404 - Page Not Found
                 </div>
-              } 
+              }
             />
           </Routes>
 
           {showNavbarAndFooter && <Footer />}
           <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />
         </div>
-      </CartProvider>
     </AuthProvider>
   );
 }

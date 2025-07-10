@@ -134,10 +134,10 @@ const ProductDetail = () => {
                       <>
                         <div className="flex items-center gap-2">
                           <span className="line-through text-gray-400 text-sm">
-                            AUD {original}
+                            AED {original}
                           </span>
                           <span className="text-green-600 font-bold text-lg">
-                            AUD {current}
+                            AED {current}
                           </span>
                         </div>
                         <div className="text-xs text-red-500 font-medium mt-1">
@@ -146,7 +146,7 @@ const ProductDetail = () => {
                       </>
                     ) : (
                       <div className="text-lg font-bold text-gray-700">
-                        AUD {current}
+                        AED {current}
                       </div>
                     )}
 
@@ -235,17 +235,17 @@ const ProductDetail = () => {
                               {discountPercentage > 0 ? (
                                 <div className="flex items-center gap-2 mt-1">
                                   <Text delete className="text-sm text-gray-400">
-                                    AUD {original}
+                                    AED {original}
                                   </Text>
                                   <Text strong className="text-green-600">
-                                    AUD {current}
+                                    AED {current}
                                   </Text>
                                   <Text type="danger" className="text-xs">
                                     Save {discountPercentage}%
                                   </Text>
                                 </div>
                               ) : (
-                                <Text strong>AUD {current}</Text>
+                                <Text strong>AED {current}</Text>
                               )}
                             </>
                           }

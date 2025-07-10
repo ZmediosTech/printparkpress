@@ -1,245 +1,150 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Link as ScrollLink } from "react-scroll";
-import footerLogo from "../../assets/logo.jpeg";
-import BgImage from "../../assets/hero/home.webp"; 
-// <- imported background
-import Logo from "../../assets/hero/logo.png";
+import { useNavigate } from "react-router-dom";
 
-
-import Banner from "../../assets/website/footer-pattern.jpg";
 import {
   FaFacebook,
   FaInstagram,
   FaLinkedin,
   FaLocationArrow,
   FaMobileAlt,
-  FaTimes,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
-const BannerImg = {
-  // backgroundImage: `url(${Banner})`,
-  backgroundPosition: "bottom",
-  backgroundRepeat: "no-repeat",
-  backgroundSize: "cover",
-  width: "100%",
-};
+import Logo from "../../assets/hero/logo.png";
+import Banner from "../../assets/website/footer-pattern.jpg";
 
 const FooterLinks = [
   { title: "Home", link: "home" },
   { title: "About", link: "about" },
   { title: "Contact", link: "contact" },
-  // { title: "Blog", link: "blog" },
 ];
 
 const Footer = () => {
-  const [isContactOpen, setIsContactOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-  
+  const nav = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
     message: "",
   });
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const nav = useNavigate()
+
   const handleSubmit = async (e) => {
-    setLoading(true);
-
     e.preventDefault();
+    setLoading(true);
     try {
-      const contactData = {
-        email: formData.email,
-        phone: formData.phone,
-        message: formData.message,
-      };
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/contact`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(contactData),
-        }
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
       const data = await response.json();
-      if (data.success == true) {
+      if (data.success) {
         toast.success("Message sent successfully!");
-        setIsContactOpen(false);
         setFormData({ email: "", phone: "", message: "" });
-      setLoading(false);
-
+      } else {
+        toast.error("Failed to send message.");
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      toast.error("Failed to send message. Please try again.");
+      console.error("Submit error:", error);
+      toast.error("Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-  //     </div>
-  //   );
-  // }
+
   return (
-    <>
-      <div style={BannerImg} className=" w-full bg-[#44A0A0]  ">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            data-aos="zoom-in"
-            className="grid md:grid-cols-3 gap-8 pt-10 py-8"
-          >
-            {/* Company Details */}
-            <div>
-              <h1 className="sm:text-3xl text-white text-xl font-bold mb-3 flex items-center gap-3">
-                <img
-                  src={Logo}
-                  alt="Printpark Press Logo"
-                  className="  h-12 w-24 object-cover"
-                />
-                Printpark Press
-              </h1>
-              <p className="text-sm text-white">
-                Printpark Press is a modern, responsive eCommerce web application
-                designed to provide users with a seamless online shopping
-                experience. Built with a user-friendly interface and secure
-                backend, the platform allows customers to browse a wide range of
-                products, manage their cart, and complete purchases efficiently.
-              </p>
+    <footer
+      className="w-full text-white bg-[#44A0A0]"
+      style={{
+        // backgroundImage: `url(${Banner})`,
+        backgroundPosition: "bottom",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* Company Info */}
+          <div data-aos="zoom-in">
+            <div className="mb-4">
+              <img
+                src={Logo}
+                alt="Printpark Press Logo"
+                className="h-14 w-28 object-cover"
+              />
             </div>
+            <p className="text-sm leading-relaxed">
+              Printpark Press is a modern, responsive eCommerce platform designed for a seamless shopping experience — browse, manage your cart, and checkout with ease.
+            </p>
+          </div>
 
-            {/* Footer Links */}
-            <div className="md:col-span-1 text-white">
-              <h1 className="text-xl font-bold mb-3">Important Links</h1>
-              <ul className="flex flex-col gap-3">
-                {FooterLinks.map((item) => (
-                  <li key={item.title}>
-                    {item.title === "Contact" ? (
-                      <button
-                        onClick={() => nav("/contact")}
-                        className="cursor-pointer hover:text-orange-500 transition-all duration-200 "
-                      >
-                        {item.title}
-                      </button>
-                    ) : (
-                      <ScrollLink
-                        to={item.link}
-                        smooth={true}
-                        duration={800}
-                        offset={-70}
-                        className="cursor-pointer hover:text-orange-500 transition-all duration-200 "
-                      >
-                        {item.title}
-                      </ScrollLink>
-                    )}
-                  </li>
-                ))}
-              </ul>
+          {/* Important Links */}
+          <div data-aos="zoom-in">
+            <h2 className="text-lg font-semibold mb-4">Important Links</h2>
+            <ul className="space-y-3">
+              {FooterLinks.map((item) => (
+                <li key={item.title}>
+                  {item.title === "Contact" ? (
+                    <button
+                      onClick={() => nav("/contact")}
+                      className="hover:text-orange-400 transition"
+                    >
+                      {item.title}
+                    </button>
+                  ) : (
+                    <ScrollLink
+                      to={item.link}
+                      smooth={true}
+                      duration={500}
+                      offset={-70}
+                      className="cursor-pointer hover:text-orange-400 transition"
+                    >
+                      {item.title}
+                    </ScrollLink>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact Info + Socials */}
+          <div data-aos="zoom-in">
+            <h2 className="text-lg font-semibold mb-4">Contact Us</h2>
+            <div className="flex items-center gap-3 mb-3">
+              <FaLocationArrow />
+              <span>Burj Khalifa, Dubai</span>
             </div>
-
-            {/* Social & Contact */}
-            <div>
-              <h1 className="text-xl font-bold mb-3 text-white">Contact Us</h1>
-              <div className="flex items-center gap-3 mb-3 text-white">
-                <FaLocationArrow />
-                <p>Burj Khalifa, Dubai</p>
-              </div>
-              <div className="flex items-center gap-3 text-white mb-6">
-                <FaMobileAlt />
-                <p>+91 123456789</p>
-              </div>
-              <div className="flex items-center gap-4 text-white">
-                <a href="#">
-                  <FaInstagram className="text-2xl hover:text-orange-500 transition" />
-                </a>
-                <a href="#">
-                  <FaFacebook className="text-2xl hover:text-orange-500 transition" />
-                </a>
-                <a href="#">
-                  <FaLinkedin className="text-2xl hover:text-orange-500 transition" />
-                </a>
-              </div>
+            <div className="flex items-center gap-3 mb-6">
+              <FaMobileAlt />
+              <span>+91 123456789</span>
+            </div>
+            <div className="flex gap-4 text-2xl">
+              <a href="#" aria-label="Instagram" className="hover:text-orange-400 transition">
+                <FaInstagram />
+              </a>
+              <a href="#" aria-label="Facebook" className="hover:text-orange-400 transition">
+                <FaFacebook />
+              </a>
+              <a href="#" aria-label="LinkedIn" className="hover:text-orange-400 transition">
+                <FaLinkedin />
+              </a>
             </div>
           </div>
+        </div>
+
+        <div className="mt-10 border-t border-white/30 pt-6 text-center text-sm text-white/80">
+          &copy; {new Date().getFullYear()} Printpark Press. All rights reserved.
         </div>
       </div>
-
-      {/* Contact Popup */}
-      {isContactOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md relative">
-            <button
-              onClick={() => setIsContactOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-            >
-              <FaTimes size={20} />
-            </button>
-
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">
-              Contact Us
-            </h2>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Your Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone Number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
-                />
-              </div>
-
-              <div>
-                <textarea
-                  name="message"
-                  placeholder="Your Message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows="6"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-                  required
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-    </>
+    </footer>
   );
 };
 

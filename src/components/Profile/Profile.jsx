@@ -19,28 +19,28 @@ const { Title, Text } = Typography;
 
 const Profile = () => {
   const [form] = Form.useForm();
-  const [addresses, setAddresses] = useState(
-    JSON.parse(localStorage.getItem("addresses")) || []
-  );
+  const [addresses, setAddresses] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-
-  const [userInfo, setUserInfo] = useState(
-    JSON.parse(localStorage.getItem("userInfo")) || {
-      fullName: "John Doe",
-      email: "john@example.com",
-      mobile: "1234567890",
-    }
-  );
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     AOS.init({ duration: 700 });
+    fetchAddresses();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("addresses", JSON.stringify(addresses));
-    localStorage.setItem("userInfo", JSON.stringify(userInfo));
-  }, [addresses, userInfo]);
+  const fetchAddresses = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/${userId}`
+      );
+      const data = await res.json();
+      if (data.success) setAddresses(data.addresses);
+      else message.error("Failed to load addresses");
+    } catch {
+      message.error("Error loading addresses");
+    }
+  };
 
   const openModal = (index = null) => {
     if (index !== null) {
@@ -53,23 +53,63 @@ const Profile = () => {
     setShowModal(true);
   };
 
-  const handleSave = (values) => {
-    const updatedAddresses = [...addresses];
-    if (editIndex !== null) {
-      updatedAddresses[editIndex] = values;
-      message.success("Address updated successfully");
-    } else {
-      updatedAddresses.push(values);
-      message.success("Address added successfully");
+  const handleSave = async (values) => {
+    try {
+      if (editIndex !== null) {
+        // Update address
+        const addressId = addresses[editIndex]._id;
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/users/${userId}/${addressId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setAddresses(data.addresses);
+          message.success("Address updated successfully");
+        }
+      } else {
+        // Add new address
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/users/${userId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values),
+          }
+        );
+        const data = await res.json();
+        if (data.success) {
+          setAddresses(data.addresses);
+          message.success("Address added successfully");
+        }
+      }
+      setShowModal(false);
+    } catch {
+      message.error("Failed to save address");
     }
-    setAddresses(updatedAddresses);
-    setShowModal(false);
   };
 
-  const handleDelete = (index) => {
-    const updated = addresses.filter((_, i) => i !== index);
-    setAddresses(updated);
-    message.success("Address removed");
+  const handleDelete = async (index) => {
+    try {
+      const addressId = addresses[index]._id;
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/${userId}/${addressId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setAddresses(data.addresses);
+        message.success("Address removed");
+      }
+    } catch {
+      message.error("Failed to delete address");
+    }
   };
 
   return (
@@ -101,7 +141,13 @@ const Profile = () => {
               </Col>
             ) : (
               addresses.map((address, index) => (
-                <Col xs={24} sm={12} md={8} key={index} data-aos="fade-up">
+                <Col
+                  xs={24}
+                  sm={12}
+                  md={8}
+                  key={address._id}
+                  data-aos="fade-up"
+                >
                   <Card
                     type="inner"
                     title={<Text strong>{address.name}</Text>}
@@ -138,6 +184,7 @@ const Profile = () => {
                         {address.state} - {address.pincode}
                       </Text>
                       <Text>📞 {address.mobile}</Text>
+                      {address.email && <Text>📧 {address.email}</Text>}
                     </Space>
                   </Card>
                 </Col>
@@ -146,69 +193,106 @@ const Profile = () => {
           </Row>
         </Card>
 
-        {/* Address Modal */}
+        {/* Modal */}
         <Modal
           title={editIndex !== null ? "Edit Address" : "Add New Address"}
           open={showModal}
           onCancel={() => setShowModal(false)}
-          onOk={() => form.submit()}
+          onOk={async () => {
+            try {
+              const values = await form.validateFields();
+              handleSave(values);
+            } catch (err) {
+              console.log("Validation Failed:", err);
+            }
+          }}
           okText="Save"
           destroyOnClose
           width={600}
-          
           okButtonProps={{
             type: "primary",
             style: { backgroundColor: "#1677ff", borderColor: "#1677ff" },
           }}
         >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleSave}
-            className="pt-2"
-          >
+          <Form form={form} layout="vertical" className="pt-2">
             <Form.Item
-              name="name"
+              name="fullName"
               label="Full Name"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Full name is required" }]}
             >
               <Input placeholder="Full Name" />
             </Form.Item>
+
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[
+                { required: true, message: "Email is required" },
+                {
+                  pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Enter a valid email address",
+                },
+              ]}
+            >
+              <Input placeholder="Email" />
+            </Form.Item>
+
             <Form.Item
               name="mobile"
               label="Mobile Number"
-              rules={[{ required: true }]}
+              rules={[
+                { required: true, message: "Mobile number is required" },
+                {
+                  pattern: /^05\d{8}$/,
+                  message: "Enter a valid UAE mobile number (e.g., 0501234567)",
+                },
+              ]}
             >
-              <Input placeholder="Mobile number" />
+              <Input placeholder="0501234567" maxLength={10} />
             </Form.Item>
+
             <Form.Item
               name="pincode"
               label="Pincode"
-              rules={[{ required: true }]}
+              rules={[
+                { required: true, message: "Pincode is required" },
+                {
+                  pattern: /^\d{5,6}$/,
+                  message: "Pincode must be 5 or 6 digits only",
+                },
+              ]}
             >
-              <Input placeholder="Pincode" />
+              <Input placeholder="Enter pincode" maxLength={6} />
             </Form.Item>
-            <Form.Item name="state" label="State" rules={[{ required: true }]}>
+
+            <Form.Item
+              name="state"
+              label="State"
+              rules={[{ required: true, message: "State is required" }]}
+            >
               <Input placeholder="State" />
             </Form.Item>
+
             <Form.Item
               name="address"
               label="Full Address"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Address is required" }]}
             >
               <Input.TextArea rows={2} placeholder="House No, Street, Area" />
             </Form.Item>
+
             <Form.Item
               name="locality"
               label="Locality"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "Locality is required" }]}
             >
               <Input placeholder="Locality" />
             </Form.Item>
+
             <Form.Item
               name="cityDistrict"
               label="City / District"
-              rules={[{ required: true }]}
+              rules={[{ required: true, message: "City/District is required" }]}
             >
               <Input placeholder="City/District" />
             </Form.Item>

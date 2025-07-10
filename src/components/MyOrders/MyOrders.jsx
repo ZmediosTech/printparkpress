@@ -87,7 +87,7 @@ const MyOrders = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-4 mt-24 min-h-screen">
+    <div className="max-w-6xl mx-auto p-4 mt-20 min-h-screen">
       <h2 className="text-3xl font-bold mb-8 text-center" data-aos="fade-down">
         My Orders
       </h2>
@@ -144,7 +144,6 @@ const MyOrders = () => {
                   <div
                     key={item._id}
                     className="p-4 border-b last:border-none hover:bg-gray-50 cursor-pointer transition"
-                    onClick={() => navigate(`/product/${item.productId}`)}
                   >
                     <div className="flex gap-4">
                       <div className="w-24 h-24">
@@ -152,6 +151,7 @@ const MyOrders = () => {
                           src={`${import.meta.env.VITE_IMAGE_BASE_URL}${
                             item.image
                           }`}
+                          onClick={() => navigate(`/product/${item.productId}`)}
                           alt={item.name}
                           className="w-full h-full object-cover rounded-md"
                           onError={(e) => {
@@ -172,7 +172,7 @@ const MyOrders = () => {
                             </p>
                           )}
                           <p className="text-orange-500 font-semibold mt-1">
-                            AUD {parseFloat(item.price).toLocaleString("en-IN")}
+                            AED {parseFloat(item.price).toLocaleString("en-IN")}
                           </p>
                         </div>
 
@@ -192,31 +192,31 @@ const MyOrders = () => {
                             {item.status || "Processing"}
                           </span>
                         </p>
+                        {item?.status !== "Cancelled" &&
+                          item?.status !== "Delivered" && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation(); // prevent navigation
+                                setSelectedOrderProduct({
+                                  orderId: order._id,
+                                  productId: item.productId,
+                                });
+                                setCancelModalVisible(true);
+                              }}
+                              className="text-sm text-red-600 underline hover:text-red-800 transition ml-4"
+                            >
+                              Cancel Product
+                            </button>
+                          )}
 
-                        {(item.status !== "Cancelled" ||
-                          item.status === "Processing") && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation(); // prevent navigation
-                              setSelectedOrderProduct({
-                                orderId: order._id,
-                                productId: item.productId,
-                              });
-                              setCancelModalVisible(true);
-                            }}
-                            className="text-sm text-red-600 underline hover:text-red-800 transition ml-4"
-                          >
-                            Cancel Product
-                          </button>
-                        )}
-                        {item.status == "Cancelled" && (
+                        {/* {item.status == "Cancelled" && (
                           <button
                             disabled
                             className="text-gray-400 transition ml-4"
                           >
                             Cancelled
                           </button>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>
@@ -225,14 +225,14 @@ const MyOrders = () => {
                 <div className="p-4 bg-gray-50 border-t flex justify-between items-center">
                   <p className="font-medium text-gray-800">Total Amount:</p>
                   <p className="text-lg font-bold text-orange-600">
-                    AUD{" "}
-                    {order.products
+                    AED {order.totalAmount.toLocaleString("en-IN")}
+                    {/* {order.products
                       .reduce(
                         (total, item) =>
                           total + parseFloat(item.price) * item.quantity,
                         0
                       )
-                      .toLocaleString("en-IN")}
+                      .toLocaleString("en-IN")} */}
                   </p>
                 </div>
               </div>

@@ -8,6 +8,10 @@ import Img3 from "../../assets/shirt/image3.avif";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
+// ✅ Import slick-carousel styles
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 const { Title, Text, Paragraph } = Typography;
 
 const TestimonialData = [
@@ -79,11 +83,17 @@ const Testimonials = () => {
   };
 
   return (
-    <div className="py-20 my-8  dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-up">
+    <div className="py-20 my-8 dark:bg-gray-900">
+      <div
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        data-aos="fade-up"
+      >
         {/* Header */}
         <div className="text-center mb-16" data-aos="zoom-in">
-          <Title level={2} className="!text-3xl md:!text-5xl font-bold dark:!text-white">
+          <Title
+            level={2}
+            className="!text-3xl md:!text-5xl font-bold dark:!text-white"
+          >
             Customer Reviews
           </Title>
           <Text className="text-lg">
@@ -94,14 +104,15 @@ const Testimonials = () => {
         {/* Carousel */}
         <Slider {...settings}>
           {TestimonialData.map((data) => (
-            <div key={data.id} className="px-4">
+            <div key={data.id} className="px-4 h-full">
               <Card
-                className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-[1.03] dark:bg-gray-800 dark:border-none"
+                className="rounded-2xl h-full flex flex-col justify-between shadow-lg hover:shadow-xl transition-all duration-500  dark:bg-gray-800 dark:border-none"
                 bordered={false}
                 data-aos="fade-up"
               >
-                <div className="flex flex-col items-center gap-4">
-                  <div className="relative">
+                <div className="flex flex-row items-start gap-5 min-h-[240px]">
+                  {/* Avatar */}
+                  <div className="relative min-w-[96px]">
                     <Avatar
                       size={96}
                       src={data.img}
@@ -112,17 +123,26 @@ const Testimonials = () => {
                     </div>
                   </div>
 
-                  <Rate disabled defaultValue={data.rating} className="!text-orange-400" />
-
-                  <Paragraph className="text-center text-gray-600 dark:text-gray-300 !mb-4">
-                    "{data.text}"
-                  </Paragraph>
-
-                  <div className="text-center">
-                    <Title level={4} className="!mb-1 dark:!text-white">
-                      {data.name}
-                    </Title>
-                    <Text className="text-orange-500 text-sm">{data.address}</Text>
+                  {/* Content */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <Rate
+                        disabled
+                        defaultValue={data.rating}
+                        className="!text-orange-400 mb-2"
+                      />
+                      <Paragraph className="text-gray-600 dark:text-gray-300 mb-2 leading-relaxed line-clamp-4">
+                        "{data.text}"
+                      </Paragraph>
+                    </div>
+                    <div>
+                      <Title level={4} className="!mb-1 dark:!text-white">
+                        {data.name}
+                      </Title>
+                      <Text className="text-orange-500 text-sm">
+                        {data.address}
+                      </Text>
+                    </div>
                   </div>
                 </div>
               </Card>

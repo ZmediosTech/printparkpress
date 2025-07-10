@@ -142,6 +142,7 @@ const Products = ({show}) => {
                 key={product._id}
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
+                 onClick={() => handleProductClick(product)}
               >
                 <Badge.Ribbon
                   text={
@@ -185,10 +186,10 @@ const Products = ({show}) => {
                             <>
                               <div className="flex items-center gap-2">
                                 <span className="line-through text-gray-400 text-sm">
-                                  AUD {original}
+                                  AED {original}
                                 </span>
                                 <span className="text-green-600 font-bold text-lg">
-                                  AUD {current}
+                                  AED {current}
                                 </span>
                               </div>
                               <div className="text-xs text-red-500 font-medium mt-1">
@@ -197,7 +198,7 @@ const Products = ({show}) => {
                             </>
                           ) : (
                             <div className="text-lg font-bold text-gray-700">
-                              AUD {current}
+                              AED {current}
                             </div>
                           )}
                         </>

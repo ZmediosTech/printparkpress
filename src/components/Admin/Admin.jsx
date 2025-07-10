@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import {
   Layout,
   Menu,
@@ -60,7 +61,8 @@ const HomePage = () => {
   }, [menuKey]);
 
   const fetchProducts = async () => {
-    const res = await fetch("http://localhost:5000/api/products");
+    // const res = await fetch("http://localhost:5000/api/products");
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products`);
     const data = await res.json();
     if (data.success) setProducts(data.data);
   };
@@ -68,7 +70,8 @@ const HomePage = () => {
   const fetchOrders = async () => {
     setOrderLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/orders");
+      // const res = await fetch("http://localhost:5000/api/orders");
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/orders`);
       const data = await res.json();
       if (data.success) setOrders(data.data);
     } catch (err) {
@@ -88,7 +91,9 @@ const HomePage = () => {
       price: product.price,
       originalPrice: product.originalPrice,
     });
-    setImagePreview(`http://localhost:5000${product.imageUrl}`);
+    setImagePreview(
+      `${import.meta.env.VITE_IMAGE_BASE_URL}${product.imageUrl}`
+    );
     setFileList([]);
     setEditModalOpen(true);
   };
@@ -103,13 +108,16 @@ const HomePage = () => {
     formData.append("description", values.description);
     formData.append("price", values.price);
     formData.append("originalPrice", values.originalPrice);
-
+    // if (fileList.length === 0) {
+    //   message.error("Product image is required");
+    //   return;
+    // }
     if (fileList.length > 0) {
       formData.append("image", fileList[0].originFileObj);
     }
 
     const res = await fetch(
-      `http://localhost:5000/api/products/${currentProduct._id}`,
+      `${import.meta.env.VITE_API_BASE_URL}/products/${currentProduct._id}`,
       {
         method: "PUT",
         body: formData,
@@ -129,14 +137,16 @@ const HomePage = () => {
     const email = localStorage.getItem("email");
     if (email == "arihant@yopmail.com") {
       setLoading(false);
-    } else {
-      window.location.href = "http://localhost:5173/login";
+    } else { 
+      navigate("/")
+      // window.location.href = "http://localhost:5173/login";
     }
   };
   const handleUpdateReview = async () => {
     const values = await editReviewForm.validateFields();
     const res = await fetch(
-      `http://localhost:5000/api/reviews/${editingReview._id}`,
+      // `http://localhost:5000/api/reviews/${editingReview._id}`,
+      `${import.meta.env.VITE_API_BASE_URL}/reviews/${editingReview._id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -158,18 +168,18 @@ const HomePage = () => {
     setEditReviewModalOpen(true);
   };
 
-  const handleDeleteReview = async (id) => {
-    const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    if (data.success) {
-      message.success("Review deleted");
-      fetchReviews();
-    } else {
-      message.error("Failed to delete review");
-    }
-  };
+  // const handleDeleteReview = async (id) => {
+  //   const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+  //     method: "DELETE",
+  //   });
+  //   const data = await res.json();
+  //   if (data.success) {
+  //     message.success("Review deleted");
+  //     fetchReviews();
+  //   } else {
+  //     message.error("Failed to delete review");
+  //   }
+  // };
 
   useEffect(() => {
     //  checkVerification();
@@ -188,11 +198,21 @@ const HomePage = () => {
     if (addFileList.length > 0) {
       formData.append("image", addFileList[0].originFileObj);
     }
+    if (addFileList.length === 0) {
+      message.error("Product image is required");
+      return;
+    }
 
-    const res = await fetch("http://localhost:5000/api/products", {
+    // const res = await fetch("http://localhost:5000/api/products", {
+    //   method: "POST",
+    //   body: formData,
+    // });
+
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products`, {
       method: "POST",
       body: formData,
     });
+
     const data = await res.json();
     if (data.success) {
       message.success("Product added");
@@ -205,7 +225,9 @@ const HomePage = () => {
     }
   };
   const fetchContact = async () => {
-    const res = await fetch("http://localhost:5000/api/contact");
+    // const res = await fetch("http://localhost:5000/api/contact");
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contact`);
+
     const data = await res.json();
     if (data.success) setContact(data.data);
   };
@@ -229,7 +251,7 @@ const HomePage = () => {
 
       if (data.success) {
         message.success("Product status updated");
-        fetchOrders()
+        fetchOrders();
         // Ideally refetch orders here to reflect UI changes
       } else {
         message.error(data.error || "Update failed");
@@ -248,7 +270,8 @@ const HomePage = () => {
         <Image
           width={50}
           height={50}
-          src={`http://localhost:5000${url}`}
+          // src={`http://localhost:5000${url}`}
+          src={`${import.meta.env.VITE_IMAGE_BASE_URL}${url}`}
           fallback="https://via.placeholder.com/50"
         />
       ),
@@ -262,14 +285,14 @@ const HomePage = () => {
 
     { title: "Description", dataIndex: "description", ellipsis: true },
     {
-      title: "Price",
+      title: "Discount Price",
       dataIndex: "price",
-      render: (price) => `AUD ${price}`,
+      render: (price) => `AED ${price}`,
     },
     {
-      title: "originalPrice",
+      title: "Original Price",
       dataIndex: "originalPrice",
-      render: (originalPrice) => `AUD ${originalPrice}`,
+      render: (originalPrice) => `AED ${originalPrice}`,
     },
     {
       title: "Actions",
@@ -356,7 +379,10 @@ const HomePage = () => {
               <Image
                 width={50}
                 height={50}
-                src={`http://localhost:5000${p.imageUrl || p.image}`}
+                // src={`http://localhost:5000${p.imageUrl || p.image}`}
+                src={`${import.meta.env.VITE_IMAGE_BASE_URL}${
+                  p.imageUrl || p.image
+                }`}
                 alt={p.name}
                 style={{ objectFit: "cover", borderRadius: 4 }}
                 fallback="https://via.placeholder.com/50"
@@ -374,33 +400,55 @@ const HomePage = () => {
       dataIndex: "products",
       render: (products, record) => (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {products?.map((p) => (
-            <div
-              key={p._id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                background: "#fafafa",
-                padding: 6,
-                borderRadius: 4,
-              }}
-            >
-              <Select
-                value={p.status || "Processing"}
-                style={{ width: 140 }}
-                onChange={(value) =>
-                  handleStatusChange(record._id, p.productId, value)
-                }
-                options={[
-                  { label: "Processing", value: "Processing" },
-                  { label: "Shipped", value: "Shipped" },
-                  { label: "Delivered", value: "Delivered" },
-                  { label: "Cancelled", value: "Cancelled" },
-                ]}
-              />
-            </div>
-          ))}
+          {products?.map((p) => {
+            const isStatusFinal =
+              p.status === "Delivered" || p.status === "Cancelled";
+
+            const handleSelectChange = (value) => {
+              Modal.confirm({
+                title: "Confirm Status Change",
+                content: `Are you sure you want to change status to "${value}"?`,
+                okText: "Yes",
+                cancelText: "No",
+                onOk: () => handleStatusChange(record._id, p.productId, value),
+                okButtonProps: {
+                  style: {
+                    backgroundColor: "#1677ff",
+                    borderColor: "#1677ff",
+                    color: "#fff",
+                  },
+                },
+              });
+            };
+
+            return (
+              <div
+                key={p._id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  background: "#fafafa",
+                  padding: 6,
+                  borderRadius: 4,
+                }}
+                title={isStatusFinal ? "Status update is disabled" : ""}
+              >
+                <Select
+                  value={p.status || "Processing"}
+                  style={{ width: 140 }}
+                  disabled={isStatusFinal}
+                  onChange={handleSelectChange}
+                  options={[
+                    { label: "Processing", value: "Processing" },
+                    { label: "Shipped", value: "Shipped" },
+                    { label: "Delivered", value: "Delivered" },
+                    { label: "Cancelled", value: "Cancelled" },
+                  ]}
+                />
+              </div>
+            );
+          })}
         </div>
       ),
     },
@@ -579,18 +627,44 @@ const HomePage = () => {
           </Form.Item>
           <Form.Item
             name="originalPrice"
-            label="OriginalPrice"
-            rules={[{ required: true }]}
+            label="Original Price"
+            rules={[
+              { required: true, message: "Please enter the original price" },
+              {
+                validator: (_, value) =>
+                  value < 0
+                    ? Promise.reject("Original price cannot be negative")
+                    : Promise.resolve(),
+              },
+            ]}
           >
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber style={{ width: "100%" }} min={0} />
           </Form.Item>
+
           <Form.Item
             name="price"
-            label="DiscountPrice"
-            rules={[{ required: true }]}
+            label="Discount Price"
+            rules={[
+              { required: true, message: "Please enter the discount price" },
+              {
+                validator: (_, value, callback) => {
+                  const originalPrice = form.getFieldValue("originalPrice");
+                  if (value < 0) {
+                    return Promise.reject("Discount price cannot be negative");
+                  }
+                  if (originalPrice !== undefined && value >= originalPrice) {
+                    return Promise.reject(
+                      "Discount price must be less than original price"
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
           >
-            <InputNumber style={{ width: "100%" }} />
+            <InputNumber style={{ width: "100%" }} min={0} />
           </Form.Item>
+
           <Form.Item label="Image">
             <Upload
               beforeUpload={() => false}
@@ -744,7 +818,11 @@ const HomePage = () => {
           if (!productToDelete) return;
 
           const res = await fetch(
-            `http://localhost:5000/api/products/${productToDelete._id}`,
+            // `http://localhost:5000/api/products/${productToDelete._id}`,
+            `${import.meta.env.VITE_API_BASE_URL}/products/${
+              productToDelete._id
+            }`,
+
             {
               method: "DELETE",
             }
@@ -793,11 +871,15 @@ const HomePage = () => {
         onCancel={() => setReviewModalOpen(false)}
         onOk={async () => {
           const values = await reviewForm.validateFields();
-          const res = await fetch("http://localhost:5000/api/reviews", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(values),
-          });
+          // const res = await fetch("http://localhost:5000/api/reviews", {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/reviews`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(values),
+            }
+          );
           const data = await res.json();
           if (data.success) {
             message.success("Review added");

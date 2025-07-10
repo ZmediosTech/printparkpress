@@ -7,7 +7,7 @@ const CategoryHero = () => {
   const navigate = useNavigate();
 
   return (
-<section className="w-full h-[650px] mt-24  overflow-hidden">
+<section className="w-full h-[650px] mt-20  overflow-hidden">
   <img
     src={BgImage}
     alt="Category Hero"

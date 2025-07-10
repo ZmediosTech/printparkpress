@@ -1,15 +1,15 @@
 // src/pages/ResetPassword.jsx
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
-const navigate = useNavigate()
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleReset = async (e) => {
@@ -21,12 +21,15 @@ const navigate = useNavigate()
 
     try {
       setLoading(true);
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/reset-password`, {
-        token,
-        password
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/reset-password`,
+        {
+          token,
+          password,
+        }
+      );
       setMessage(res.data.message || "Password reset successful!");
-      navigate("/login")
+      navigate("/login");
     } catch (err) {
       setMessage(err.response?.data?.message || "Something went wrong");
     } finally {
@@ -35,22 +38,32 @@ const navigate = useNavigate()
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <form onSubmit={handleReset} className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+    <div
+      style={{
+        objectFit: "cover",
+        backgroundImage:
+          "url('https://img.freepik.com/premium-photo/colorful-school-supplies_488220-26258.jpg?semt=ais_hybrid&w=740')",
+      }}
+      className="min-h-screen flex items-center justify-center bg-gray-100 p-4"
+    >
+      <form
+        onSubmit={handleReset}
+        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
+      >
         <h2 className="text-2xl font-semibold mb-4">Reset Your Password</h2>
         <input
           type="password"
           className="w-full p-2 border mb-4 rounded"
           placeholder="New Password"
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <input
           type="password"
           className="w-full p-2 border mb-4 rounded"
           placeholder="Confirm New Password"
           value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
         <button
           type="submit"

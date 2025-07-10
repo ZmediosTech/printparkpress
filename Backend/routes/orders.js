@@ -176,6 +176,7 @@ router.get("/user/:email", async (req, res) => {
     const orders = await Order.find({ "user.email": req.params.email }).sort({
       orderDate: -1,
     });
+    
 
     if (orders.length === 0) {
       return res.status(404).json({
@@ -184,10 +185,27 @@ router.get("/user/:email", async (req, res) => {
       });
     }
 
+    // Recalculate totalAmount for each order (excluding cancelled products)
+    const updatedOrders = orders.map((order) => {
+      const activeProducts = order.products.filter(
+        (p) => p.status !== "Cancelled"
+      );
+      const recalculatedTotal = activeProducts.reduce(
+        (sum, p) => sum + p.price * (p.quantity || 1),
+        0
+      );
+      console.log(recalculatedTotal,"recalculatedTotal")
+
+      return {
+        ...order.toObject(),
+        totalAmount: recalculatedTotal,
+      };
+    });
+
     res.status(200).json({
       success: true,
-      count: orders.length,
-      data: orders,
+      count: updatedOrders.length,
+      data: updatedOrders,
     });
   } catch (error) {
     res.status(500).json({
@@ -196,6 +214,7 @@ router.get("/user/:email", async (req, res) => {
     });
   }
 });
+
 
 // Get all orders
 router.get("/", async (req, res) => {
