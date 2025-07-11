@@ -12,7 +12,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUserEmail('');
-    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userEmail'); 
+    localStorage.removeItem('userName');
+
   };
 
   return (

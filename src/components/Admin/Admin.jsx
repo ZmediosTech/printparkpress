@@ -440,6 +440,8 @@ const HomePage = () => {
                   disabled={isStatusFinal}
                   onChange={handleSelectChange}
                   options={[
+                    { label: "Confirmed", value: "Confirmed" },
+
                     { label: "Processing", value: "Processing" },
                     { label: "Shipped", value: "Shipped" },
                     { label: "Delivered", value: "Delivered" },
@@ -459,7 +461,7 @@ const HomePage = () => {
           (sum, p) => sum + p.price * p.quantity,
           0
         );
-        return `₹${total.toLocaleString("en-IN")}`;
+        return `AED${total.toLocaleString("en-IN")}`;
       },
     },
   ];
@@ -482,6 +484,7 @@ const HomePage = () => {
           className="w-14 h-14 px-2 mx-4 object-contain"
         />
         <Menu
+        
           theme="dark"
           mode="inline"
           selectedKeys={[menuKey]}

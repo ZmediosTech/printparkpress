@@ -32,7 +32,8 @@ const Navbar = () => {
   const email = localStorage.getItem("email");
   const profileMenuRef = useRef(null);
   const searchRef = useRef(null);
-
+  const userName = localStorage.getItem("userName");
+  const userInitial = userName?.charAt(0)?.toUpperCase();
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -60,6 +61,8 @@ const Navbar = () => {
       localStorage.removeItem("savedItems_guest");
     }
     localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+
     localStorage.removeItem("email");
     localStorage.removeItem("token");
     navigate("/login");
@@ -144,6 +147,22 @@ const Navbar = () => {
               )}
             </div>
           )}
+
+          {/* {email == "manish@yopmail.com"}
+          {
+            <button
+              onClick={() => {
+                if (email == "arihant@yopmail.com") {
+                  navigate("/admin");
+                } else {
+                  toast.error("you are not authorized to access this page");
+                }
+              }}
+              className=" transform -transalte-y-1/2 text-white font-medium p-2 m-1 bg-yellow-500 rounded-md "
+            >
+              Admin Panel
+            </button>
+          } */}
         </div>
 
         {/* Nav Menu */}
@@ -166,11 +185,16 @@ const Navbar = () => {
           <div className="relative" ref={profileMenuRef}>
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="p-2 hover:text-orange-300 transition-colors flex items-center gap-1 text-white"
+              className="p-2 hover:text-orange-300 transition-colors flex items-center gap-2 text-white"
+              aria-label="User menu"
+              title={userName || "User"}
             >
-              {/* Avatar with First Letter */}
-              <div className="w-8 h-8 bg-white text-black font-semibold rounded-full flex items-center justify-center">
-                {localStorage.getItem("userName")?.charAt(0)?.toUpperCase()}
+              <div className="w-8 h-8 bg-white text-black font-semibold rounded-full flex items-center justify-center hover:scale-105 transition-transform duration-200">
+                {userInitial ? (
+                  userInitial
+                ) : (
+                  <FaUser className="text-black text-sm" />
+                )}
               </div>
               <FaCaretDown className="text-sm" />
             </button>
